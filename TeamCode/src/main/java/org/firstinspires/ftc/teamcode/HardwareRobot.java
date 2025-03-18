@@ -18,6 +18,8 @@ public class HardwareRobot {
     public final MotorEx rightFront;
     public final MotorEx leftBack;
     public final MotorEx rightBack;
+    public final Servo claw;
+    public final Servo elbow;
 
     public final GoBildaPinpointDriver pinpoint;
 
@@ -81,6 +83,8 @@ public class HardwareRobot {
         ////////////
         // SERVOS //
         ////////////
+        claw = hardwareMap.get(Servo.class, "Claw");
+        elbow = hardwareMap.get(Servo.class, "Elbow");
         ////////////
         // CAMERA //
         ////////////
