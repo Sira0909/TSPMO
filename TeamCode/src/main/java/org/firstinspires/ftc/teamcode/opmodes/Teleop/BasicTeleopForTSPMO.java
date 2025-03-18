@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 
-public class BasicTeleopForTspmo extends LinearOpMode {
+public class BasicTeleopForTSPMO extends LinearOpMode {
     @Override
     public void runOpMode () throws InterruptedException {
         HardwareRobot robot = new HardwareRobot(hardwareMap);
