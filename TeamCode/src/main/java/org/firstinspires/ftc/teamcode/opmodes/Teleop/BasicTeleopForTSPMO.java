@@ -24,6 +24,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         while (opModeIsActive()) {
 	        drivecommands();
 		armcommands();
+		letterbuttons();
         }
     }
 
