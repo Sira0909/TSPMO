@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 
 @Autonomous(name="good auto (sample)")
 public static void basicAuto extends LinearOpMode{
-        private HardwareRobot robot = new HardwareRobot(hardwareMap);
+	public HardwareRobot robot = new HardwareRobot(hardwareMap);
 	public void runOpMode() throws InterruptedException {
 		DriveSubsystem drive = new DriveSubsystem(
 			robot.rightFront,
@@ -18,5 +18,7 @@ public static void basicAuto extends LinearOpMode{
 		);
 		waitForStart();
 		while (opModeIsActive()) {
+
+		}
 		}
 	}
