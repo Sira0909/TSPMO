@@ -38,8 +38,8 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     public void armcommands(){
 	double speed = 1;
 	double armup = -gamepad1.right_stick_y;
-	double armopen= gamepad1.left_bumper;
-	double armclose=gamepad1.right_bumper;
+	boolean armopen= gamepad1.left_bumper;
+	boolean armclose=gamepad1.right_bumper;
 	//move claw;
 
     }
