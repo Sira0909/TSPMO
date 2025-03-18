@@ -43,4 +43,25 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 	//move claw;
 
     }
+
+    public void letterbuttons(){
+	boolean a = gamepad1.a;
+	boolean b = gamepad1.b;
+	boolean x = gamepad1.x;
+	boolean y = gamepad1.y;
+	if(a){
+	    //macro to allign claw to backboard?
+	}
+	if(b){
+	    //?
+	}
+	if(x){
+	    //?
+	}
+	if(y){
+	    //launch drone?
+	}
+    }
+    
+
 }
