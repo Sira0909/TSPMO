@@ -22,11 +22,25 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         );
         waitForStart();
         while (opModeIsActive()) {
+            boolean toggleClaw = false;
+            boolean toggleElbow = false;
+            if (gamepad1.square && !toggleElbow) {
+                toggleElbow = true;
+            }
+            if (gamepad1.square && toggleElbow) {
+                toggleElbow = false;
+            }
+            if (gamepad1.circle && !toggleClaw) {
+                toggleClaw = true;
+            }
+            if (gamepad1.circle && toggleClaw) {
+                toggleClaw = false;
+            }
             double speed = 0.5;
-	       double strafe = gamepad1.left_stick_x;
-           double forward = -gamepad1.right_stick_y;
-           double turn = gamepad1.right_stick_x;
-           drive.driveRobotCentric(strafe * speed,forward * speed,turn * speed);
+	        double strafe = gamepad1.left_stick_x;
+            double forward = -gamepad1.right_stick_y;
+            double turn = gamepad1.right_stick_x;
+            drive.driveRobotCentric(strafe * speed,forward * speed,turn * speed);
         }
     }
 }
