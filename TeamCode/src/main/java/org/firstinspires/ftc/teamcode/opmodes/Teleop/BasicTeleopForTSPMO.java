@@ -24,32 +24,45 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         boolean claw = true, toggleClaw = false;
         boolean elbow = true, toggleElbow = false;
         while (opModeIsActive()) {
-            if (gamepad1.square && !toggleClaw) {
-                toggleClaw = true;
-                claw = !claw;
-            }
-            if (!gamepad1.square) toggleClaw = false;
-            if (claw) {
-                //default
-            }
-            else {
-                //alt-pos
-            }
-            if (gamepad1.circle && !toggleElbow) {
-                toggleElbow = true;
-                elbow = !elbow;
-            }
-            if (elbow) {
-                //changed pos
-            }
-            else {
-                //default
-            }
-            double speed = 0.5;
-	        double strafe = gamepad1.left_stick_x;
-            double forward = -gamepad1.right_stick_y;
-            double turn = gamepad1.right_stick_x;
-            drive.driveRobotCentric(strafe * speed,forward * speed,turn * speed);
+	        driveCommands();
+		      armCommands();
+		      letterButtons();
+        }
+    }
+
+    public void driveCommands(){
+        double speed = 1;
+        double strafe = gamepad1.left_stick_x;
+        double forward = -gamepad1.left_stick_y;
+        double turn = gamepad1.right_stick_x;
+        drive.driveRobotCentric(strafe * speed, forward * speed, turn * speed);
+    }
+    
+    public void armCommands(){
+        double speed = 1;
+        double armup = -gamepad1.right_stick_y;
+        boolean armopen= gamepad1.left_bumper;
+        boolean armclose=gamepad1.right_bumper;
+        //move claw;
+
+    }
+
+    public void letterButtons(){
+        boolean cross = gamepad1.cross;
+        boolean circle = gamepad1.circle;
+        boolean square = gamepad1.square;
+        boolean triangle = gamepad1.triangle;
+        if(cross){
+            //macro to allign claw to backboard?
+        }
+        if(circle){
+            //?
+        }
+        if(square){
+            //?
+        }
+        if(triangle){
+            //launch drone?
         }
     }
 }
