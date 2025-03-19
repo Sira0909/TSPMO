@@ -29,39 +29,39 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     }
 
     public void drivecommands(){
-            double speed = 1;
-            double strafe = gamepad1.left_stick_x;
-            double forward = -gamepad1.left_stick_y;
-            double turn = gamepad1.right_stick_x;
-            drive.driveRobotCentric(strafe * speed, forward * speed, turn * speed);
+        double speed = 1;
+        double strafe = gamepad1.left_stick_x;
+        double forward = -gamepad1.left_stick_y;
+        double turn = gamepad1.right_stick_x;
+        drive.driveRobotCentric(strafe * speed, forward * speed, turn * speed);
     }
     
     public void armcommands(){
-	double speed = 1;
-	double armup = -gamepad1.right_stick_y;
-	boolean armopen= gamepad1.left_bumper;
-	boolean armclose=gamepad1.right_bumper;
-	//move claw;
+        double speed = 1;
+        double armup = -gamepad1.right_stick_y;
+        boolean armopen= gamepad1.left_bumper;
+        boolean armclose=gamepad1.right_bumper;
+        //move claw;
 
     }
 
     public void letterbuttons(){
-	boolean cross = gamepad1.cross;
-	boolean circle = gamepad1.circle;
-	boolean square = gamepad1.square;
-	boolean triangle = gamepad1.triangle;
-	if(cross){
-	    //macro to allign claw to backboard?
-	}
-	if(circle){
-	    //?
-	}
-	if(square){
-	    //?
-	}
-	if(triangle){
-	    //launch drone?
-	}
+        boolean cross = gamepad1.cross;
+        boolean circle = gamepad1.circle;
+        boolean square = gamepad1.square;
+        boolean triangle = gamepad1.triangle;
+        if(cross){
+            //macro to allign claw to backboard?
+        }
+        if(circle){
+            //?
+        }
+        if(square){
+            //?
+        }
+        if(triangle){
+            //launch drone?
+        }
     }
     
 
