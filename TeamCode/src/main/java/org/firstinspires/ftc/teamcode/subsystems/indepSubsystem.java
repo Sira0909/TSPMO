@@ -25,11 +25,11 @@ public class indepSubsystem extends SubsystemBase {
     }
     double clawposition=0;
 
-    public void setClawPosition(double position){
+    public void setArmPosition(double position){
 
     }
 
-    public void adjustClawPosition(double adjust){
+    public void adjustArmPosition(double adjust){
 
     }
 
