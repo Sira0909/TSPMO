@@ -23,22 +23,13 @@ public class indepSubsystem extends SubsystemBase {
         DRIVE = driveSubsystem;
         //CV = cvSubsystem;
     }
-    double clawposition=0;
 
-    public void setArmPosition(double position){
-
+    public void setElbowPos(double ElbowPos) {
+        HARDWARE_ROBOT.elbow.setPosition(ElbowPos);
     }
 
-    public void adjustArmPosition(double adjust){
-
-    }
-
-    public void openClaw(){
-
-    }
-
-    public void closeClaw(){
-
+    public void setClawPos(double clawPos) {
+        HARDWARE_ROBOT.claw.setPosition(clawPos);
     }
 
 

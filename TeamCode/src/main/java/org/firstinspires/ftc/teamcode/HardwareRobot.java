@@ -23,8 +23,8 @@ public class HardwareRobot {
 
     public final Limelight3A limelight;
     public final WebcamName cameraName;
-    //public final Servo claw;
-    //public final Servo elbow;
+    public final Servo claw;
+    public final Servo elbow;
 
     public HardwareRobot(HardwareMap hardwareMap) {
 
@@ -69,8 +69,8 @@ public class HardwareRobot {
         //////////
         // LIFT //
         //////////
-        //claw = hardwareMap.get(Servo.class, "Claw");
-        //elbow = hardwareMap.get(Servo.class, "Elbow");
+        claw = hardwareMap.get(Servo.class, "Claw");
+        elbow = hardwareMap.get(Servo.class, "Elbow");
         //////////////
         // PINPOINT //
         //////////////
