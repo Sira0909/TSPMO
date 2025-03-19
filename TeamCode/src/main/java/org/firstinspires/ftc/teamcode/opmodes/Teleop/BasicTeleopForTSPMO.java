@@ -24,7 +24,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         boolean claw = true, toggleClaw = false;
         boolean elbow = true, toggleElbow = false;
         while (opModeIsActive()) {
-	        driveCommands();
+	          driveCommands();
             armCommands();
             letterButtons();
         }
