@@ -21,19 +21,19 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
                 robot.leftBack
         );
         waitForStart();
+        boolean claw = true, toggleClaw = false;
+        boolean elbow = true, toggleElbow = false;
         while (opModeIsActive()) {
-            boolean claw = true, toggleClaw = false;
-            boolean elbow = true, toggleElbow = false;
             if (gamepad1.square && !toggleClaw) {
                 toggleClaw = true;
                 claw = !claw;
             }
             if (!gamepad1.square) toggleClaw = false;
             if (claw) {
-                //alt pos
+                //default
             }
             else {
-                //default
+                //alt-pos
             }
             if (gamepad1.circle && !toggleElbow) {
                 toggleElbow = true;
