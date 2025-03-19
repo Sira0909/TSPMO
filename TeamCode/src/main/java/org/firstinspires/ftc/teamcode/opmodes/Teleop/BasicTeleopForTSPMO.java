@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 
 public class BasicTeleopForTSPMO extends LinearOpMode {
     
-
+//dude ari, this code isnt optimal. you should look at the teamcode for this season and see how teleop is structured.
     HardwareRobot robot;
     DriveSubsystem drive;
 
@@ -21,14 +21,16 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
                 robot.leftBack
         );
         waitForStart();
+        boolean claw = true, toggleClaw = false;
+        boolean elbow = true, toggleElbow = false;
         while (opModeIsActive()) {
-	        drivecommands();
-		    armcommands();
-		    letterbuttons();
+	        driveCommands();
+		      armCommands();
+		      letterButtons();
         }
     }
 
-    public void drivecommands(){
+    public void driveCommands(){
         double speed = 1;
         double strafe = gamepad1.left_stick_x;
         double forward = -gamepad1.left_stick_y;
@@ -36,7 +38,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         drive.driveRobotCentric(strafe * speed, forward * speed, turn * speed);
     }
     
-    public void armcommands(){
+    public void armCommands(){
         double speed = 1;
         double armup = -gamepad1.right_stick_y;
         boolean armopen= gamepad1.left_bumper;
@@ -45,7 +47,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
     }
 
-    public void letterbuttons(){
+    public void letterButtons(){
         boolean cross = gamepad1.cross;
         boolean circle = gamepad1.circle;
         boolean square = gamepad1.square;
@@ -63,6 +65,5 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
             //launch drone?
         }
     }
-    
-
 }
+

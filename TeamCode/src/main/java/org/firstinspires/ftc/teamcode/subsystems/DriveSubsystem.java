@@ -4,10 +4,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.drivebase.RobotDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
-
-import org.firstinspires.ftc.teamcode.synchropather.DriveConstants;
 import org.opencv.core.Point;
-import org.firstinspires.ftc.teamcode.synchropather.systems.rotation.RotationConstants;
 
 public class DriveSubsystem extends SubsystemBase {
 

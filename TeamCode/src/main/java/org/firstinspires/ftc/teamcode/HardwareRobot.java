@@ -77,10 +77,6 @@ public class HardwareRobot {
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class,"pinpoint");
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
-
-        ////////////
-        // SERVOS //
-        ////////////
         ////////////
         // CAMERA //
         ////////////
