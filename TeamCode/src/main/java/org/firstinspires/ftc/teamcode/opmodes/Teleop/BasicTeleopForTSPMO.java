@@ -3,29 +3,24 @@ package org.firstinspires.ftc.teamcode.opmodes.Teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
+import org.firstinspires.ftc.teamcode.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.indepSubsystem;
 
 public class BasicTeleopForTSPMO extends LinearOpMode {
     
-//dude ari, this code isnt optimal. you should look at the teamcode for this season and see how teleop is structured.
-    HardwareRobot robot;
-    DriveSubsystem drive;
+
+    public RobotSystem robot;
 
     @Override
     public void runOpMode () throws InterruptedException {
-        robot = new HardwareRobot(hardwareMap);
-        drive = new DriveSubsystem(
-                robot.rightFront,
-                robot.rightBack,
-                robot.leftFront,
-                robot.leftBack
-        );
+        this.robot = new RobotSystem(hardwareMap,this);
         waitForStart();
         boolean claw = true, toggleClaw = false;
         boolean elbow = true, toggleElbow = false;
         while (opModeIsActive()) {
-	          driveCommands();
-            armCommands();
+            driveCommands();
+            elbowCommands();
             letterButtons();
         }
     }
@@ -35,15 +30,12 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         double strafe = gamepad1.left_stick_x;
         double forward = -gamepad1.left_stick_y;
         double turn = gamepad1.right_stick_x;
-        drive.driveRobotCentric(strafe * speed, forward * speed, turn * speed);
+        robot.drive.driveRobotCentric(strafe * speed, forward * speed, turn * speed);
     }
     
-    public void armCommands(){
+    public void elbowCommands(){
         double speed = 1;
-        double armup = -gamepad1.right_stick_y;
-        boolean armopen= gamepad1.left_bumper;
-        boolean armclose=gamepad1.right_bumper;
-        //move claw;
+        double armUp = -gamepad1.right_stick_y;
 
     }
 
@@ -56,9 +48,10 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
             //macro to allign claw to backboard?
         }
         if(circle){
-            //?
+            robot.inDep.setClawPos(0);
         }
         if(square){
+            robot.inDep.setElbowPos(0);
             //?
         }
         if(triangle){
