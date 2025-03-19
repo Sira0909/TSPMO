@@ -28,7 +28,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         }
     }
 
-    public void drivecommands(){
+    public void driveCommands(){
         double speed = 1;
         double strafe = gamepad1.left_stick_x;
         double forward = -gamepad1.left_stick_y;
@@ -36,7 +36,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         drive.driveRobotCentric(strafe * speed, forward * speed, turn * speed);
     }
     
-    public void armcommands(){
+    public void armCommands(){
         double speed = 1;
         double armup = -gamepad1.right_stick_y;
         boolean armopen= gamepad1.left_bumper;
@@ -45,7 +45,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
     }
 
-    public void letterbuttons(){
+    public void letterButtons(){
         boolean cross = gamepad1.cross;
         boolean circle = gamepad1.circle;
         boolean square = gamepad1.square;
