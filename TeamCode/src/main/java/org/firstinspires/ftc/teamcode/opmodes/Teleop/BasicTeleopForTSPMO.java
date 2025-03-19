@@ -22,19 +22,28 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         );
         waitForStart();
         while (opModeIsActive()) {
-            boolean toggleClaw = false;
-            boolean toggleElbow = false;
-            if (gamepad1.square && !toggleElbow) {
-                toggleElbow = true;
-            }
-            if (gamepad1.square && toggleElbow) {
-                toggleElbow = false;
-            }
-            if (gamepad1.circle && !toggleClaw) {
+            boolean claw = true, toggleClaw = false;
+            boolean elbow = true, toggleElbow = false;
+            if (gamepad1.square && !toggleClaw) {
                 toggleClaw = true;
+                claw = !claw;
             }
-            if (gamepad1.circle && toggleClaw) {
-                toggleClaw = false;
+            if (!gamepad1.square) toggleClaw = false;
+            if (claw) {
+                //alt pos
+            }
+            else {
+                //default
+            }
+            if (gamepad1.circle && !toggleElbow) {
+                toggleElbow = true;
+                elbow = !elbow;
+            }
+            if (elbow) {
+                //changed pos
+            }
+            else {
+                //default
             }
             double speed = 0.5;
 	        double strafe = gamepad1.left_stick_x;
