@@ -23,4 +23,25 @@ public class indepSubsystem extends SubsystemBase {
         DRIVE = driveSubsystem;
         //CV = cvSubsystem;
     }
+    double clawposition=0;
+
+    public void setClawPosition(double position){
+
+    }
+
+    public void adjustClawPosition(double adjust){
+
+    }
+
+    public void openClaw(){
+
+    }
+
+    public void closeClaw(){
+
+    }
+
+
+
+
 }
