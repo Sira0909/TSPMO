@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 
 public class BasicTeleopForTSPMO extends LinearOpMode {
     
-
+//dude ari, this code isnt optimal. you should look at the teamcode for this season and see how teleop is structured.
     HardwareRobot robot;
     DriveSubsystem drive;
 
@@ -22,47 +22,26 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         );
         waitForStart();
         while (opModeIsActive()) {
-	        drivecommands();
-		    armcommands();
-		    letterbuttons();
+            boolean toggleClaw = false;
+            boolean toggleElbow = false;
+            if (gamepad1.square && !toggleElbow) {
+                toggleElbow = true;
+            }
+            if (gamepad1.square && toggleElbow) {
+                toggleElbow = false;
+            }
+            if (gamepad1.circle && !toggleClaw) {
+                toggleClaw = true;
+            }
+            if (gamepad1.circle && toggleClaw) {
+                toggleClaw = false;
+            }
+            double speed = 0.5;
+	        double strafe = gamepad1.left_stick_x;
+            double forward = -gamepad1.right_stick_y;
+            double turn = gamepad1.right_stick_x;
+            drive.driveRobotCentric(strafe * speed,forward * speed,turn * speed);
         }
     }
-
-    public void drivecommands(){
-            double speed = 1;
-            double strafe = gamepad1.left_stick_x;
-            double forward = -gamepad1.left_stick_y;
-            double turn = gamepad1.right_stick_x;
-            drive.driveRobotCentric(strafe * speed, forward * speed, turn * speed);
-    }
-    
-    public void armcommands(){
-	double speed = 1;
-	double armup = -gamepad1.right_stick_y;
-	boolean armopen= gamepad1.left_bumper;
-	boolean armclose=gamepad1.right_bumper;
-	//move claw;
-
-    }
-
-    public void letterbuttons(){
-	boolean cross = gamepad1.cross;
-	boolean circle = gamepad1.circle;
-	boolean square = gamepad1.square;
-	boolean triangle = gamepad1.triangle;
-	if(cross){
-	    //macro to allign claw to backboard?
-	}
-	if(circle){
-	    //?
-	}
-	if(square){
-	    //?
-	}
-	if(triangle){
-	    //launch drone?
-	}
-    }
-    
-
 }
+

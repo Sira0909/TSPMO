@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 /**
  * Estimate robot pose with a Kalman Filter using odometry as the model, imu and camera as sensors.
  */
-@Config
 public class LocalizationSubsystem extends SubsystemBase {
 
     ///////////////////
