@@ -1,9 +1,20 @@
 package org.firstinspires.ftc.teamcode.opmodes.Teleop;
 
+import android.graphics.Canvas;
+import android.util.Size;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.opencv.core.Mat;
+
+import java.util.ArrayList;
 
 public class BasicTeleopForTSPMO extends LinearOpMode {
     
@@ -21,11 +32,30 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
                 robot.leftBack
         );
         waitForStart();
-        while (opModeIsActive()) {
+
+        AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                .build();
+
+        VisionPortal visionPortal = new VisionPortal.Builder()
+                .addProcessor(tagProcessor)
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCameraResolution(new Size(640,480)) // place holder values ask for real size
+                .build();
+
+
+        while (!isStopRequested() && opModeIsActive()) {
+
+
 	        drivecommands();
 		    armcommands();
 		    letterbuttons();
         }
+
+
     }
 
     public void drivecommands(){
