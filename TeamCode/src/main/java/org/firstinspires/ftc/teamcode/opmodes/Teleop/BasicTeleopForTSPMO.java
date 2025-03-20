@@ -31,7 +31,6 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
                 robot.leftFront,
                 robot.leftBack
         );
-        waitForStart();
 
         AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)
@@ -46,13 +45,16 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
                 .setCameraResolution(new Size(640,480)) // place holder values ask for real size
                 .build();
 
+        waitForStart();
+
+
+
 
         while (!isStopRequested() && opModeIsActive()) {
-
-
 	        drivecommands();
 		    armcommands();
 		    letterbuttons();
+            apriltagdetect(tagProcessor);
         }
 
 
@@ -75,23 +77,34 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
     }
 
-    public void letterbuttons(){
-	boolean cross = gamepad1.cross;
-	boolean circle = gamepad1.circle;
-	boolean square = gamepad1.square;
-	boolean triangle = gamepad1.triangle;
-	if(cross){
-	    //macro to allign claw to backboard?
-	}
-	if(circle){
-	    //?
-	}
-	if(square){
-	    //?
-	}
-	if(triangle){
-	    //launch drone?
-	}
+    public void letterbuttons() {
+        boolean cross = gamepad1.cross;
+        boolean square = gamepad1.square;
+        boolean triangle = gamepad1.triangle;
+        if (cross) {
+            //macro to allign claw to backboard?
+        }
+        if (square) {
+            //?
+        }
+        if (triangle) {
+            //launch drone?
+        }
+    }
+
+    public void apriltagdetect(AprilTagProcessor tagProcessor) {
+        if (gamepad1.circle) {
+            if (tagProcessor.getDetections().size() > 0) {
+                AprilTagDetection tag = tagProcessor.getDetections().get(0);
+                telemetry.addLine("AprilTag Detected!");
+                telemetry.addLine("x: " + tag.ftcPose.x);
+                telemetry.addLine("y: " + tag.ftcPose.y);
+                telemetry.addLine("z: " + tag.ftcPose.z);
+            } else {
+                telemetry.addLine("No Tag Detected.");
+            }
+            telemetry.update();
+        }
     }
     
 
