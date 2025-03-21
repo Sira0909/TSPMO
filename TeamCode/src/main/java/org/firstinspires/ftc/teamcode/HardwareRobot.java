@@ -23,6 +23,8 @@ public class HardwareRobot {
 
     public final Limelight3A limelight;
     public final WebcamName cameraName;
+    public final MotorEx leftLift; //confirm motor type
+    public final MotorEx rightLift; //same as previous
     public final Servo claw;
     public final Servo elbow;
 
@@ -69,8 +71,26 @@ public class HardwareRobot {
         //////////
         // LIFT //
         //////////
-        claw = hardwareMap.get(Servo.class, "Claw");
-        elbow = hardwareMap.get(Servo.class, "Elbow");
+        leftLift = new MotorEx(hardwareMap, "leftLift", Motor.GoBILDA.RPM_312);
+        leftLift.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftLift.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftLift.setRunMode(Motor.RunMode.RawPower);
+        leftLift.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftLift.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        leftLift.setInverted(false);
+
+        rightLift = new MotorEx(hardwareMap, "rightLift", Motor.GoBILDA.RPM_312);
+        rightLift.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightLift.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightLift.setRunMode(Motor.RunMode.RawPower);
+        rightLift.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightLift.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rightLift.setInverted(true);
+        /////////////
+        // SERVOS  //
+        /////////////
+        claw = hardwareMap.get(ServoImplEx.class, "Claw");
+        elbow = hardwareMap.get(ServoImplEx.class, "Elbow");
         //////////////
         // PINPOINT //
         //////////////

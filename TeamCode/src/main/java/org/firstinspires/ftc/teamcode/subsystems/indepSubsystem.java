@@ -32,6 +32,13 @@ public class indepSubsystem extends SubsystemBase {
         HARDWARE_ROBOT.claw.setPosition(clawPos);
     }
 
+    public void setLeftLiftPos(double leftLiftUp) {
+        HARDWARE_ROBOT.leftLift.setTargetPosition(0); //tune
+    }
+    public void setRightLiftPos(double rightLiftPos) {
+        HARDWARE_ROBOT.rightLift.setTargetPosition(0); //tune
+    }
+
 
 
 
