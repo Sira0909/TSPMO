@@ -53,7 +53,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
                 //adding cam to do the actual detection
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                 //setting cam positions
-                .setCameraResolution(new Size(640,480)) // place holder values ask for real size
+                .setCameraResolution(new Size(640, 480)) // place holder values ask for real size
                 .build();
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
@@ -61,11 +61,20 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
             armcommands();
             letterbuttons();
             apriltagdetect(tagProcessor);
+            liftCommands();
         }
 
 
     }
-
+    public void liftCommands() {
+        double leftLiftPos = 0;
+        double rightLiftPos = 0;
+        double triggerPower = gamepad1.left_trigger - gamepad1.right_trigger;
+        leftLiftPos += triggerPower;
+        rightLiftPos += triggerPower;
+        robot.inDep.setLeftLiftPos(leftLiftPos);
+        robot.inDep.setRightLiftPos(rightLiftPos);
+    }
     public void drivecommands() {
         double speed = 1;
         double strafe = gamepad1.left_stick_x;
