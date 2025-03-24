@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
+import org.firstinspires.ftc.teamcode.RobotConstants;
 import org.firstinspires.ftc.teamcode.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -28,7 +29,9 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     boolean toggleClaw = false;
     boolean claw = true;
     boolean toggleElbow = false;
-    
+
+    private final RobotConstants ROBOTCONSTANTS=new RobotConstants();
+
     @Override
     public void runOpMode () throws InterruptedException {
         //define robot object
@@ -40,7 +43,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         //ari also wanted this
         double elbowPos = gamepad1.right_stick_y;
         //setting pos for claw and elbow
-        robot.inDep.setClawPos(clawClosed); //test servo positions once accessible
+        robot.inDep.closeClaw(); //test servo positions once accessible
         robot.inDep.setElbowPos(elbowPos); //test servo pos as well
         //apriltag intialization
         AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder() //creates object of processor class for detection\
@@ -68,13 +71,10 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         }
     }
     public void liftCommands() {
-        double leftLiftPos = 0;
-        double rightLiftPos = 0;
-        double triggerPower = gamepad1.left_trigger - gamepad1.right_trigger;
-        leftLiftPos += triggerPower;
-        rightLiftPos += triggerPower;
-        robot.inDep.setLeftLiftPos(leftLiftPos);
-        robot.inDep.setRightLiftPos(rightLiftPos);
+
+        int triggerPower = (int)(gamepad1.left_trigger - gamepad1.right_trigger);
+        int LiftPos = triggerPower/ROBOTCONSTANTS.TRIGGERMAX;
+        robot.inDep.SetLiftDir(LiftPos);
     }
     public void driveCommands() {
         double speed = 1;
@@ -97,9 +97,9 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
                 toggleClaw = false;
             }
             if (claw) {
-                robot.inDep.setClawPos(clawClosed);
+                robot.inDep.closeClaw();
             } else {
-                robot.inDep.setClawPos(clawOpen);
+                robot.inDep.openClaw();
             }
     }
 

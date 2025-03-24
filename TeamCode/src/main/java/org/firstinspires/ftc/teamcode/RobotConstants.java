@@ -7,4 +7,5 @@ public class RobotConstants {
     public double BOTTOMLIFT;
     public int LIFTUPCONST;
     public int LIFTDOWNCONST;
+    public int TRIGGERMAX;
 }
