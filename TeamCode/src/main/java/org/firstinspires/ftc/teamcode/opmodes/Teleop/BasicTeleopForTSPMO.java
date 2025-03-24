@@ -45,6 +45,8 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         //setting pos for claw and elbow
         robot.inDep.closeClaw(); //test servo positions once accessible
         robot.inDep.setElbowPos(elbowPos); //test servo pos as well
+
+
         //apriltag intialization
         AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder() //creates object of processor class for detection\
                 //calling set up methods - drawing and mapping out possible predicted tags
@@ -62,6 +64,15 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
                 //setting cam positions
                 .setCameraResolution(new Size(640, 480)) // place holder values ask for real size
                 .build();
+
+
+
+        //  /====    ======        /\       |==\    ======
+        // |           ||         /  \      |   |     ||
+        //  \===\      ||        /    \     |==/      ||
+        //       |     ||       /======\    | \       ||
+        //  ====/      ||      /        \   |  \      ||
+
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
             driveCommands();
@@ -74,7 +85,21 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
         int triggerPower = (int)(gamepad1.left_trigger - gamepad1.right_trigger);
         int LiftPos = triggerPower/ROBOTCONSTANTS.TRIGGERMAX;
-        robot.inDep.SetLiftDir(LiftPos);
+        if(gamepad1.cross) {//down
+            robot.inDep.LiftDown();
+        }
+        else if(gamepad1.triangle) {//up
+            robot.inDep.LiftUp();
+        }
+        else {
+            robot.inDep.SetLiftDir(LiftPos);
+        }
+    }
+    public void elbowCommands() {
+
+        double triggerPower = gamepad1.right_stick_y;
+        double elbow = triggerPower/ROBOTCONSTANTS.ELBOWCONST;
+        robot.inDep.changeElbowPos(elbow);
     }
     public void driveCommands() {
         double speed = 1;
@@ -101,11 +126,18 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
             } else {
                 robot.inDep.openClaw();
             }
+            if(gamepad1.cross){
+                //see lift
+            }
+            if(gamepad1.triangle) {
+                //see lift
+            }
+
     }
 
 //method for detection
     public void aprilTagDetect(AprilTagProcessor tagProcessor) {
-        if (gamepad1.circle) {
+        if (gamepad1.square) {
             List<AprilTagDetection> detections = tagProcessor.getDetections();
             if (!detections.isEmpty()) {
                 telemetry.addLine("AprilTags Detected:");

@@ -30,8 +30,10 @@ public class indepSubsystem extends SubsystemBase {
 
 
     public void setElbowPos(double ElbowPos) {
-
-        HARDWARE_ROBOT.elbow.setPosition(ElbowPos);
+        LOWCLAW.setElbowPos(ElbowPos);
+    }
+    public void changeElbowPos(double ElbowPos){
+        LOWCLAW.setElbowPos(LOWCLAW.getElbowPos()+ElbowPos);
     }
 
     public void openClaw(){
@@ -40,11 +42,11 @@ public class indepSubsystem extends SubsystemBase {
     public void closeClaw(){
         LOWCLAW.setClawPos(ROBOTCONSTANTS.CLOSECLAW);
     }
-    public void LiftUp(){
+    public void LiftUp(){//sets lift to go up at max speed
         LOWCLAW.setLeftLiftDirection(ROBOTCONSTANTS.LIFTUPCONST);
         LOWCLAW.setRightLiftDirection(ROBOTCONSTANTS.LIFTUPCONST);
     }
-    public void LiftDown(){
+    public void LiftDown(){//sets lift to go down at max speed
         LOWCLAW.setLeftLiftDirection(ROBOTCONSTANTS.LIFTDOWNCONST);
         LOWCLAW.setRightLiftDirection(ROBOTCONSTANTS.LIFTDOWNCONST);
     }

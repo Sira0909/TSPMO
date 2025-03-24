@@ -10,7 +10,8 @@ public class LowClawSubsystem extends SubsystemBase {
     private final LinearOpMode OP_MODE;
     private final DriveSubsystem DRIVE;
 
-
+    private double elbowPos;
+    public double getElbowPos(){return elbowPos;}
     public LowClawSubsystem(
             HardwareRobot hardwareRobot,
             LinearOpMode opMode,
@@ -24,7 +25,7 @@ public class LowClawSubsystem extends SubsystemBase {
     }
 
     public void setElbowPos(double ElbowPos) {
-
+        elbowPos = ElbowPos;
         HARDWARE_ROBOT.elbow.setPosition(ElbowPos);
     }
 
