@@ -25,6 +25,10 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 //creates robot as object of compiled robotsystem class w all subsystems
     public RobotSystem robot;
 
+    boolean toggleClaw = false;
+    boolean claw = true;
+    boolean toggleElbow = false;
+    
     @Override
     public void runOpMode () throws InterruptedException {
         //define robot object
@@ -53,58 +57,56 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
                 //adding cam to do the actual detection
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                 //setting cam positions
-                .setCameraResolution(new Size(640,480)) // place holder values ask for real size
+                .setCameraResolution(new Size(640, 480)) // place holder values ask for real size
                 .build();
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
-            drivecommands();
-            armcommands();
+            driveCommands();
+            aprilTagDetect(tagProcessor);
+            liftCommands();
             letterbuttons();
-            apriltagdetect(tagProcessor);
         }
-
-
     }
-
-    public void drivecommands() {
+    public void liftCommands() {
+        double leftLiftPos = 0;
+        double rightLiftPos = 0;
+        double triggerPower = gamepad1.left_trigger - gamepad1.right_trigger;
+        leftLiftPos += triggerPower;
+        rightLiftPos += triggerPower;
+        robot.inDep.setLeftLiftPos(leftLiftPos);
+        robot.inDep.setRightLiftPos(rightLiftPos);
+    }
+    public void driveCommands() {
         double speed = 1;
         double strafe = gamepad1.left_stick_x;
         double forward = -gamepad1.left_stick_y;
         double turn = gamepad1.right_stick_x;
         robot.drive.driveRobotCentric(strafe * speed, forward * speed, turn * speed);
     }
+    
+    public void letterbuttons(){
 
-    public void armcommands(){
-        double speed = 1;
-        double armup = -gamepad1.right_stick_y;
-        boolean armopen= gamepad1.left_bumper;
-        boolean armclose=gamepad1.right_bumper;
-        if(armopen){
-
-        }
-        //move claw;
-
+            if (gamepad1.triangle) {
+                //launch drone?
+            }
+            if (gamepad1.circle && !toggleClaw) {
+                toggleClaw = true;
+                claw = !claw;
+            }
+            if (!gamepad1.circle) {
+                toggleClaw = false;
+            }
+            if (claw) {
+                robot.inDep.setClawPos(clawClosed);
+            } else {
+                robot.inDep.setClawPos(clawOpen);
+            }
     }
 
-    public void letterbuttons() {
-        boolean cross = gamepad1.cross;
-        boolean square = gamepad1.square;
-        boolean triangle = gamepad1.triangle;
-        if (cross) {
-            //macro to allign claw to backboard?
-        }
-        if (square) {
-            //?
-        }
-        if (triangle) {
-            //launch drone?
-        }
-    }
 //method for detection
-    public void apriltagdetect(AprilTagProcessor tagProcessor) {
+    public void aprilTagDetect(AprilTagProcessor tagProcessor) {
         if (gamepad1.circle) {
             List<AprilTagDetection> detections = tagProcessor.getDetections();
-
             if (!detections.isEmpty()) {
                 telemetry.addLine("AprilTags Detected:");
                 for (AprilTagDetection tag : detections) {
