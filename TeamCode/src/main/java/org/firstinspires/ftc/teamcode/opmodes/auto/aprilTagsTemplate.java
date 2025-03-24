@@ -24,7 +24,9 @@ public class aprilTagsTemplate extends LinearOpMode {
                     telemetry.addData("z", tag.ftcPose.z);
                     telemetry.addData("Distance", tag.ftcPose.range);
                     telemetry.addData("Yaw", tag.ftcPose.yaw);
+                    //now im forced to do auto inside of this... fix this later bc it would do pd controller for every tag
                     double error = tag.ftcPose.range;
+
                 }
             } else {
                 telemetry.addLine("No Tag Detected.");
