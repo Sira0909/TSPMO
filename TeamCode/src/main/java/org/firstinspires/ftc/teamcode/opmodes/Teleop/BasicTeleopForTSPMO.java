@@ -25,6 +25,10 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 //creates robot as object of compiled robotsystem class w all subsystems
     public RobotSystem robot;
 
+    boolean toggleClaw = false;
+    boolean claw = true;
+    boolean toggleElbow = false;
+    
     @Override
     public void runOpMode () throws InterruptedException {
         //define robot object
@@ -60,24 +64,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
             driveCommands();
             aprilTagDetect(tagProcessor);
             liftCommands();
-            boolean toggleClaw = false;
-            boolean claw = true;
-            boolean toggleElbow = false;
-            if (gamepad1.triangle) {
-                //launch drone?
-            }
-            if (gamepad1.circle && !toggleClaw) {
-                toggleClaw = true;
-                claw = !claw;
-            }
-            if (!gamepad1.circle) {
-                toggleClaw = false;
-            }
-            if (claw) {
-                robot.inDep.setClawPos(clawClosed);
-            } else {
-                robot.inDep.setClawPos(clawOpen);
-            }
+            letterbuttons();
         }
     }
     public void liftCommands() {
@@ -95,6 +82,25 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         double forward = -gamepad1.left_stick_y;
         double turn = gamepad1.right_stick_x;
         robot.drive.driveRobotCentric(strafe * speed, forward * speed, turn * speed);
+    }
+    
+    public void letterbuttons(){
+
+            if (gamepad1.triangle) {
+                //launch drone?
+            }
+            if (gamepad1.circle && !toggleClaw) {
+                toggleClaw = true;
+                claw = !claw;
+            }
+            if (!gamepad1.circle) {
+                toggleClaw = false;
+            }
+            if (claw) {
+                robot.inDep.setClawPos(clawClosed);
+            } else {
+                robot.inDep.setClawPos(clawOpen);
+            }
     }
 
 //method for detection
