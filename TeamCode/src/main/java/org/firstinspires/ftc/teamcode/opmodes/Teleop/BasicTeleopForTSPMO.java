@@ -65,11 +65,11 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
 
 
-        //  /====    ======        /\       |==\    ======
-        // |           ||         /  \      |   |     ||
-        //  \===\      ||        /    \     |==/      ||
-        //       |     ||       /======\    | \       ||
-        //  ====/      ||      /        \   |  \      ||
+        //  /=====    ========        /\       |====\    ========
+        // |             ||          //\\      |     |      ||
+        //  \====\       ||         //  \\     |====/       ||
+        //        |      ||        //====\\    |  \\        ||
+        //  =====/       ||       //      \\   |   \\       ||
 
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
@@ -80,6 +80,13 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
             letterbuttons();
         }
     }
+
+
+    //  ||       ========   |======  ========
+    //  ||          ||      ||          ||
+    //  ||          ||      |=====      ||
+    //  ||          ||      ||          ||
+    //  ======   ========   ||          ||
     public void liftCommands() {
 
         double triggerPower = (gamepad1.left_trigger - gamepad1.right_trigger);
