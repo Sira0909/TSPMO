@@ -76,6 +76,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
             driveCommands();
+            elbowCommands();
             aprilTagDetect(tagProcessor);
             liftCommands();
             letterbuttons();
@@ -99,7 +100,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
         double triggerPower = gamepad1.right_stick_y;
         double elbow = triggerPower/ROBOTCONSTANTS.ELBOWCONST;
-        robot.inDep.changeElbowPos(elbow);
+        robot.inDep.adjustElbowPos(elbow);
     }
     public void driveCommands() {
         double speed = 1;

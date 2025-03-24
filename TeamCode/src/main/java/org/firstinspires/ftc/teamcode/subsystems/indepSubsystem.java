@@ -32,7 +32,7 @@ public class indepSubsystem extends SubsystemBase {
     public void setElbowPos(double ElbowPos) {
         LOWCLAW.setElbowPos(ElbowPos);
     }
-    public void changeElbowPos(double ElbowPos){
+    public void adjustElbowPos(double ElbowPos){
         LOWCLAW.setElbowPos(LOWCLAW.getElbowPos()+ElbowPos);
     }
 
