@@ -71,11 +71,11 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
 
 
-        //  /====    ======        /\       |==\    ======
-        // |           ||         /  \      |   |     ||
-        //  \===\      ||        /    \     |==/      ||
-        //       |     ||       /======\    | \       ||
-        //  ====/      ||      /        \   |  \      ||
+        //  /=====    ========        /\       |====\    ========
+        // |             ||          //\\      |     |      ||
+        //  \====\       ||         //  \\     |====/       ||
+        //        |      ||        //====\\    |  \\        ||
+        //  =====/       ||       //      \\   |   \\       ||
 
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
@@ -86,6 +86,13 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
             letterbuttons();
         }
     }
+
+
+    //  ||       ========   |======  ========
+    //  ||          ||      ||          ||
+    //  ||          ||      |=====      ||
+    //  ||          ||      ||          ||
+    //  ======   ========   ||          ||
     public void liftCommands() {
 
         double triggerPower = (gamepad1.left_trigger - gamepad1.right_trigger);
@@ -151,6 +158,8 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
                     telemetry.addData("x", tag.ftcPose.x);
                     telemetry.addData("y", tag.ftcPose.y);
                     telemetry.addData("z", tag.ftcPose.z);
+                    telemetry.addData("Distance: ", tag.ftcPose.range);
+                    telemetry.addData("Yaw: ", tag.ftcPose.yaw);
                 }
             } else {
                 telemetry.addLine("No Tag Detected.");
