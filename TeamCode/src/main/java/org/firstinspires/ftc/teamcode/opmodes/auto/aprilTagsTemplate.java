@@ -12,9 +12,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 
 public class aprilTagsTemplate extends LinearOpMode {
-
-
-
     public void aprilTagDetect(AprilTagProcessor tagProcessor) {
         if (true) {
             List<AprilTagDetection> detections = tagProcessor.getDetections();
@@ -25,6 +22,9 @@ public class aprilTagsTemplate extends LinearOpMode {
                     telemetry.addData("x", tag.ftcPose.x);
                     telemetry.addData("y", tag.ftcPose.y);
                     telemetry.addData("z", tag.ftcPose.z);
+                    telemetry.addData("Distance", tag.ftcPose.range);
+                    telemetry.addData("Yaw", tag.ftcPose.yaw);
+                    double error = tag.ftcPose.range;
                 }
             } else {
                 telemetry.addLine("No Tag Detected.");
@@ -32,7 +32,6 @@ public class aprilTagsTemplate extends LinearOpMode {
             telemetry.update();
         }
     }
-
     @Override
     public void runOpMode() throws InterruptedException {
         AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder() //creates object of processor class for detection\
@@ -51,8 +50,9 @@ public class aprilTagsTemplate extends LinearOpMode {
                 //setting cam positions
                 .setCameraResolution(new Size(640, 480)) // place holder values ask for real size
                 .build();
-        while(true) {
-            aprilTagDetect();
+        while(opModeIsActive()) {
+            aprilTagDetect(tagProcessor);
+
+            }
         }
     }
-}
