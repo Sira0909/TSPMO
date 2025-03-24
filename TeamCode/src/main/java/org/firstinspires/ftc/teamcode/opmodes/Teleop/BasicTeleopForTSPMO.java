@@ -28,8 +28,6 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
     boolean toggleClaw = false;
     boolean claw = true;
-    boolean toggleElbow = false;
-
     private final RobotConstants ROBOTCONSTANTS=new RobotConstants();
 
     @Override
@@ -84,8 +82,8 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     }
     public void liftCommands() {
 
-        int triggerPower = (int)(gamepad1.left_trigger - gamepad1.right_trigger);
-        int LiftPos = triggerPower/ROBOTCONSTANTS.TRIGGERMAX;
+        double triggerPower = (gamepad1.left_trigger - gamepad1.right_trigger);
+        int LiftPos = (int)triggerPower/ROBOTCONSTANTS.TRIGGERMAX;
         if(gamepad1.cross) {//down
             robot.inDep.LiftDown();
         }
@@ -98,8 +96,8 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     }
     public void elbowCommands() {
 
-        double triggerPower = gamepad1.right_stick_y;
-        double elbow = triggerPower/ROBOTCONSTANTS.ELBOWCONST;
+        double triggerpower = gamepad1.right_stick_y;
+        double elbow = triggerpower/ROBOTCONSTANTS.ELBOWCONST;
         robot.inDep.adjustElbowPos(elbow);
     }
     public void driveCommands() {
