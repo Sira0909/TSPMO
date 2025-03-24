@@ -66,10 +66,10 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
 
         //  /=====    ========        /\       |====\    ========
-        // |             ||          /  \      |     |      ||
-        //  \====\       ||         /____\     |====/       ||
-        //        |      ||        /      \    |  \         ||
-        //  =====/       ||       /        \   |    \       ||
+        // |             ||          //\\      |     |      ||
+        //  \====\       ||         //  \\     |====/       ||
+        //        |      ||        //====\\    |  \\        ||
+        //  =====/       ||       //      \\   |   \\       ||
 
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
