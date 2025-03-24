@@ -24,6 +24,12 @@ import java.util.List;
 public class BasicTeleopForTSPMO extends LinearOpMode {
 
 //creates robot as object of compiled robotsystem class w all subsystems
+    //  ======    |\\    ||  ======  =========
+    //    ||      ||\\   ||    ||       ||
+    //    ||      || \\  ||    ||       ||
+    //    ||      ||  \\ ||    ||       ||
+    //    ||      ||   \\||    ||       ||
+    //  ======    ||    \\|  ======     ||
     public RobotSystem robot;
 
     boolean toggleClaw = false;
