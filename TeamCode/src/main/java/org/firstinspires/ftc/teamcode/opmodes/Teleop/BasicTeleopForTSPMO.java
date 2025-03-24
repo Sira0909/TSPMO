@@ -84,8 +84,8 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     }
     public void liftCommands() {
 
-        int triggerPower = (int)(gamepad1.left_trigger - gamepad1.right_trigger);
-        int LiftPos = triggerPower/ROBOTCONSTANTS.TRIGGERMAX;
+        double triggerPower = (gamepad1.left_trigger - gamepad1.right_trigger);
+        int LiftPos = (int)triggerPower/ROBOTCONSTANTS.TRIGGERMAX;
         if(gamepad1.cross) {//down
             robot.inDep.LiftDown();
         }
