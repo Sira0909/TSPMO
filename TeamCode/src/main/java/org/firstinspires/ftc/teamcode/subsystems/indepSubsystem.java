@@ -1,43 +1,51 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
-
+import org.firstinspires.ftc.teamcode.RobotConstants;
 public class indepSubsystem extends SubsystemBase {
     private final HardwareRobot HARDWARE_ROBOT;
     private final LinearOpMode OP_MODE;
     private final DriveSubsystem DRIVE;
+    private final LowClawSubsystem LOWCLAW;
+    private final RobotConstants ROBOTCONSTANTS=new RobotConstants();
     //private final CVSubsystem CV;
-
 
     public indepSubsystem(
             HardwareRobot hardwareRobot,
             LinearOpMode opMode,
-            DriveSubsystem driveSubsystem
+            DriveSubsystem driveSubsystem,
+            LowClawSubsystem LowClaw
             //CVSubsystem cvSubsystem
     ) {
         HARDWARE_ROBOT = hardwareRobot;
         OP_MODE = opMode;
         DRIVE = driveSubsystem;
+        LOWCLAW = LowClaw;
         //CV = cvSubsystem;
     }
 
-    public void setElbowPos(double ElbowPos) {
-        HARDWARE_ROBOT.elbow.setPosition(ElbowPos);
+
+
+
+    public void openClaw(){
+        LOWCLAW.setClawPos(ROBOTCONSTANTS.OPENCLAW);
+    }
+    public void closeClaw(){
+        LOWCLAW.setClawPos(ROBOTCONSTANTS.CLOSECLAW);
+    }
+    public void LiftUp(){
+        LOWCLAW.setLeftLiftDirection(ROBOTCONSTANTS.LIFTUPCONST);
+        LOWCLAW.setRightLiftDirection(ROBOTCONSTANTS.LIFTUPCONST);
+    }
+    public void setLiftPos(double LiftUp){
+        LOWCLAW.setLeftLiftDirection(ROBOTCONSTANTS.LIFTDOWNCONST);
+        LOWCLAW.setRightLiftDirection(ROBOTCONSTANTS.LIFTDOWNCONST);
     }
 
-    public void setClawPos(double clawPos) {
-        HARDWARE_ROBOT.claw.setPosition(clawPos);
-    }
-
-    public void setLeftLiftPos(double leftLiftUp) {
-        HARDWARE_ROBOT.leftLift.setTargetPosition(0); //tune
-    }
-    public void setRightLiftPos(double rightLiftPos) {
-        HARDWARE_ROBOT.rightLift.setTargetPosition(0); //tune
-    }
 
 
 
