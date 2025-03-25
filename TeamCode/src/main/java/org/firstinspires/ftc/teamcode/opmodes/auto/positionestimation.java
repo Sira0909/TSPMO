@@ -19,11 +19,7 @@ public class positionestimation extends LinearOpMode {
                 telemetry.addLine("AprilTags Detected:");
                 for (AprilTagDetection tag : detections) {
                     telemetry.addData("Tag ID", tag.id);
-//                    telemetry.addData("x", tag.ftcPose.x);
-//                    telemetry.addData("y", tag.ftcPose.y);
-//                    telemetry.addData("z", tag.ftcPose.range);
                     telemetry.addData("Distance", tag.ftcPose.range);
-//                    telemetry.addData("Yaw", tag.ftcPose.yaw);
                     double error = tag.ftcPose.range;
                     double complementarybearing = 90 - tag.ftcPose.bearing;
                     double tagangletorobot = tag.ftcPose.yaw+complementarybearing;
