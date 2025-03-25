@@ -11,7 +11,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
-public class aprilTagsTemplate extends LinearOpMode {
+public class positionestimation extends LinearOpMode {
     public void aprilTagDetect(AprilTagProcessor tagProcessor) {
         if (true) {
             List<AprilTagDetection> detections = tagProcessor.getDetections();
@@ -19,12 +19,18 @@ public class aprilTagsTemplate extends LinearOpMode {
                 telemetry.addLine("AprilTags Detected:");
                 for (AprilTagDetection tag : detections) {
                     telemetry.addData("Tag ID", tag.id);
-                    telemetry.addData("x", tag.ftcPose.x);
-                    telemetry.addData("y", tag.ftcPose.y);
-                    telemetry.addData("z", tag.ftcPose.range);
+//                    telemetry.addData("x", tag.ftcPose.x);
+//                    telemetry.addData("y", tag.ftcPose.y);
+//                    telemetry.addData("z", tag.ftcPose.range);
                     telemetry.addData("Distance", tag.ftcPose.range);
-                    telemetry.addData("Yaw", tag.ftcPose.yaw);
+//                    telemetry.addData("Yaw", tag.ftcPose.yaw);
                     double error = tag.ftcPose.range;
+                    double complementarybearing = 90 - tag.ftcPose.bearing;
+                    double tagangletorobot = tag.ftcPose.yaw+complementarybearing;
+                    double robotrelativex=Math.sin(-tagangletorobot*Math.PI/180)*tag.ftcPose.range;
+                    double robotrelativey=Math.cos(-tagangletorobot*Math.PI/180)*tag.ftcPose.range;
+                    telemetry.addData("robotrelativex",robotrelativex);
+                    telemetry.addData("robotrelativey",robotrelativey);
                 }
             } else {
                 telemetry.addLine("No Tag Detected.");
