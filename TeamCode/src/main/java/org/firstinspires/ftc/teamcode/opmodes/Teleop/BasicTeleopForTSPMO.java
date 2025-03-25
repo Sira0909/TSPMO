@@ -117,9 +117,10 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         }
         public void PDcontroller (AprilTagDetection target){
             double kP = 0.1; double kD = 0.01; // Tune these obv
+            double targetRange = 1; //only used if we want to stop at a specific point before the apriltag
 
             double errorX = target.ftcPose.x;
-            double errorY = target.ftcPose.y - 1; // subtract 1 bc we dont wanna crash into the tag
+            double errorY = target.ftcPose.y - targetRange; // subtract 1 bc we dont wanna crash into the tag
             double errorYaw = target.ftcPose.yaw;
 
             double derivativeX = errorX -PEX ;
