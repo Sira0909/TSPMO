@@ -54,8 +54,8 @@ public class apriltagPDrelativetotags extends LinearOpMode {
         return null;
     }
     //returns an array with format:
-    //april tag x relative to bottom left corner
-    //april tag y relative to bottom left corner
+    //april tag x relative to middle
+    //april tag y relative to middle
     //april tag angle (the ones on backboard would be 0, for instance, and those opposite the backboard would be pi)
     public double[] getapriltagpositions(int tagid){
         switch(tagid){
@@ -81,11 +81,11 @@ public class apriltagPDrelativetotags extends LinearOpMode {
             double robotfieldrelativey = robotrelativey*Math.cos(radangle)-robotrelativex*Math.sin(radangle);
             //dont ask why that works i dont know. it just does. something about trig i think.
 
-
-            double robotfieldx = apriltagpositions[0]+robotfieldrelativex;
+            tag.robotPose.getPosition().x
+            double robotfieldx = tag.metadata.fieldPosition.get(0)+robotfieldrelativex;
             double robotfieldy = apriltagpositions[1]+robotfieldrelativey;
 
-            detectedpositions.add(new Double[]{robotfieldx,robotfieldy});
+            detectedpositions.add(new Double[]{tag.robotPose.getPosition().x,robotfieldy});
         }
         double avgx = 0;
         double avgy = 0;
