@@ -66,6 +66,13 @@ public class apriltagPDrelativetotags extends LinearOpMode {
         double timelist[] = {runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds()};
         double lastD;
         while (currenterror>GOALERROR){
+
+
+            //NOTE: I HAD AN IDEA FOR HOW TO DO THIS, FEEL FREE TO CHANGE AND OR REMOVE. THE METHOD
+            //I WAS WRITING IS UNFINISHED, DONT TRUST IT
+
+
+
             currentposrelative = getposrelativetoapriltag(tagProcessor,tagid);
             if(currentposrelative==null){currenterror=null;}else{
             currenterror = Math.hypot(Math.abs(currentposrelative[0]-targetx),Math.abs(currentposrelative[1]-targetrange));}
