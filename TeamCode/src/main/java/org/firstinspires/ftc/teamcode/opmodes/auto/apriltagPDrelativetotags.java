@@ -53,49 +53,91 @@ public class apriltagPDrelativetotags extends LinearOpMode {
         }
         return null;
     }
-
-    public void changepositionrelativetotag(AprilTagProcessor tagProcessor, int tagid, int targetx, int targetrange,double guessstartx, double guessstarty){
-        double GOALERROR = 0.01;
-        double KP = 0.01;
-        double KD = 0.001;
-        Double[] currentposrelative = getposrelativetoapriltag(tagProcessor,tagid);
-        if(currentposrelative==null){currentposrelative = new Double[]{guessstartx,guessstarty};}
-        Double currenterror = Math.hypot(Math.abs(currentposrelative[0]-targetx),Math.abs(currentposrelative[1]-targetrange));
-        Double errorlist[] = {currenterror,currenterror,currenterror,currenterror,currenterror,currenterror,currenterror,currenterror,currenterror,currenterror};
-        ElapsedTime runtime = new ElapsedTime(0);
-        double timelist[] = {runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds()};
-        double lastD;
-        while (currenterror>GOALERROR){
-
-
-            //NOTE: I HAD AN IDEA FOR HOW TO DO THIS, FEEL FREE TO CHANGE AND OR REMOVE. THE METHOD
-            //I WAS WRITING IS UNFINISHED, DONT TRUST IT
-
-
-
-            currentposrelative = getposrelativetoapriltag(tagProcessor,tagid);
-            if(currentposrelative==null){currenterror=null;}else{
-            currenterror = Math.hypot(Math.abs(currentposrelative[0]-targetx),Math.abs(currentposrelative[1]-targetrange));}
-            ArrayList<Integer> validtags= new ArrayList<Integer>();
-            for (int i = 0;i<errorlist.length-1;i++){
-                errorlist[i]=errorlist[i+1];
-                if(errorlist[i]!=null){validtags.add(i);}
-                timelist[i]=timelist[i+1];
-            }
-            errorlist[errorlist.length-1]=currenterror;
-            if(currentposrelative!=null){validtags.add(errorlist.length);}
-
-            timelist[timelist.length]=runtime.seconds();
-
-            if(validtags.size()>=5){
-
-            }
-
-
+    //returns an array with format:
+    //april tag x relative to middle
+    //april tag y relative to middle
+    //april tag angle (the ones on backboard would be 0, for instance, and those opposite the backboard would be pi)
+    public double[] getapriltagpositions(int tagid){
+        switch(tagid){
 
         }
-
+        return new double[]{0};//placeholder
     }
+
+    //coords are relative to bottom left corner
+    public double[] getpositiononfeild(AprilTagProcessor tagProcessor){
+        ArrayList<Double[]> detectedpositions = new ArrayList<>();
+        List<AprilTagDetection> detections = tagProcessor.getDetections();
+        for (AprilTagDetection tag : detections) {
+            double complementarybearing = 90 - tag.ftcPose.bearing;
+            double tagangletorobot = tag.ftcPose.yaw+complementarybearing;
+            double radangle = -tagangletorobot*Math.PI/180;
+            double robotrelativex=Math.cos(radangle)*tag.ftcPose.range;
+            double robotrelativey=Math.sin(radangle)*tag.ftcPose.range;
+            double[] apriltagpositions = getapriltagpositions(tag.id);
+
+            //trig magic
+            double robotfieldrelativex = robotrelativex*Math.cos(radangle)+robotrelativey*Math.sin(radangle);
+            double robotfieldrelativey = robotrelativey*Math.cos(radangle)-robotrelativex*Math.sin(radangle);
+            //dont ask why that works i dont know. it just does. something about trig i think.
+
+            tag.robotPose.getPosition().x
+            double robotfieldx = tag.metadata.fieldPosition.get(0)+robotfieldrelativex;
+            double robotfieldy = apriltagpositions[1]+robotfieldrelativey;
+
+            detectedpositions.add(new Double[]{tag.robotPose.getPosition().x,robotfieldy});
+        }
+        double avgx = 0;
+        double avgy = 0;
+        for(int i =0;i<detectedpositions.size();i++){
+            avgx+= detectedpositions.get(i)[0]/detectedpositions.size();
+            avgy+= detectedpositions.get(i)[1]/detectedpositions.size();
+        }
+        return new double[] {avgx,avgy};
+    }
+    //target coords are relative to bottom left corner.
+//    public void changepositionrelativetotag(AprilTagProcessor tagProcessor, int tagid, int targetxonfield, int targetyonfield,double guessstartx, double guessstarty){
+//        double GOALERROR = 0.01;
+//        double KP = 0.01;
+//        double KD = 0.001;
+//        Double[] currentposrelative = getposrelativetoapriltag(tagProcessor,tagid);
+//        if(currentposrelative==null){currentposrelative = new Double[]{guessstartx,guessstarty};}
+//        Double currenterror = Math.hypot(Math.abs(currentposrelative[0]-targetx),Math.abs(currentposrelative[1]-targetrange));
+//        Double errorlist[] = {currenterror,currenterror,currenterror,currenterror,currenterror,currenterror,currenterror,currenterror,currenterror,currenterror};
+//        ElapsedTime runtime = new ElapsedTime(0);
+//        double timelist[] = {runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds()};
+//        double lastD;
+//        while (currenterror>GOALERROR){
+//
+//
+//            //NOTE: I HAD AN IDEA FOR HOW TO DO THIS, FEEL FREE TO CHANGE AND OR REMOVE. THE METHOD
+//            //I WAS WRITING IS UNFINISHED, DONT TRUST IT
+//
+//
+//
+//            currentposrelative = getposrelativetoapriltag(tagProcessor,tagid);
+//            if(currentposrelative==null){currenterror=null;}else{
+//            currenterror = Math.hypot(Math.abs(currentposrelative[0]-targetx),Math.abs(currentposrelative[1]-targetrange));}
+//            ArrayList<Integer> validtags= new ArrayList<Integer>();
+//            for (int i = 0;i<errorlist.length-1;i++){
+//                errorlist[i]=errorlist[i+1];
+//                if(errorlist[i]!=null){validtags.add(i);}
+//                timelist[i]=timelist[i+1];
+//            }
+//            errorlist[errorlist.length-1]=currenterror;
+//            if(currentposrelative!=null){validtags.add(errorlist.length);}
+//
+//            timelist[timelist.length]=runtime.seconds();
+//
+//            if(validtags.size()>=5){
+//
+//            }
+//
+//
+//
+//        }
+//
+//    }
 
     @Override
     public void runOpMode() throws InterruptedException {
