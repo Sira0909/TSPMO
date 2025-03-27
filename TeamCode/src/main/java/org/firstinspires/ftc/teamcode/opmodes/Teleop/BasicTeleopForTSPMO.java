@@ -84,6 +84,9 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
             tags(tagProcessor);
             liftCommands();
             letterbuttons();
+            if (xInchRadius(tagProcessor, 5)){
+                //slow down speed
+            }
         }
     }
 
