@@ -30,6 +30,12 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     boolean claw = true;
     private final RobotConstants ROBOTCONSTANTS=new RobotConstants();
 
+    private static double PEX = 0;
+    private static double PEY = 0;
+    private static double PEYAW = 0;
+
+    private double speed = 1;
+
     @Override
     public void runOpMode () throws InterruptedException {
         //define robot object
@@ -75,7 +81,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         while (!isStopRequested() && opModeIsActive()) {
             driveCommands();
             elbowCommands();
-            aprilTagDetect(tagProcessor);
+            tags(tagProcessor);
             liftCommands();
             letterbuttons();
         }
@@ -114,7 +120,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         double turn = gamepad1.right_stick_x;
         robot.drive.driveRobotCentric(strafe * speed, forward * speed, turn * speed);
     }
-    
+
     public void letterbuttons(){
 
             if (gamepad1.triangle) {
@@ -142,24 +148,66 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     }
 
 //method for detection
-    public void aprilTagDetect(AprilTagProcessor tagProcessor) {
-        if (gamepad1.square) {
-            List<AprilTagDetection> detections = tagProcessor.getDetections();
+    public void tags(AprilTagProcessor tagProcessor){
+        if (gamepad1.circle) { // Note: this will only move towards board while circle is held
+            ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
+            AprilTagDetection target = null;
             if (!detections.isEmpty()) {
-                telemetry.addLine("AprilTags Detected:");
                 for (AprilTagDetection tag : detections) {
-                    telemetry.addData("Tag ID", tag.id);
-                    telemetry.addData("x", tag.ftcPose.x);
-                    telemetry.addData("y", tag.ftcPose.y);
-                    telemetry.addData("z", tag.ftcPose.z);
-                    telemetry.addData("Distance: ", tag.ftcPose.range);
-                    telemetry.addData("Yaw: ", tag.ftcPose.yaw);
+                    telemetry.addLine(String.format("XYZ %6.2f %6.2f %6.2f", tag.ftcPose.x, tag.ftcPose.y, tag.ftcPose.z));
+                    if (tag.id == 1 || tag.id == 2 || tag.id == 3) { // Blue alliance tags
+                        target = tag;
+                        break;
+                    }
                 }
-            } else {
-                telemetry.addLine("No Tag Detected.");
             }
-            telemetry.update();
+            if (target != null) {
+                PDcontroller(target);
+            }
         }
+    }
+
+    public void PDcontroller (AprilTagDetection target){
+        double kP = 0.1; double kD = 0.01; // Tune these obv
+
+        double errorX = target.ftcPose.x;
+        double errorY = target.ftcPose.y - 1; // subtract 1 bc we dont wanna crash into the tag
+        double errorYaw = target.ftcPose.yaw;
+
+        double derivativeX = errorX -PEX ;
+        double derivativeY = errorY - PEY;
+        double derivativeYaw = errorYaw - PEYAW;
+
+        double strafePower = kP * errorX + kD * derivativeX;
+        double forwardPower = kP * errorY + kD * derivativeY;
+        double turnPower = kP * errorYaw + kD * derivativeYaw;
+
+        //CONVERTING STRafe FORWARD AND TUIRN POWER INTO -1 to 1 range
+        strafePower = Math.max(-1, Math.min(1, strafePower));
+        forwardPower = Math.max(-1, Math.min(1, forwardPower));
+        turnPower = Math.max(-1, Math.min(1, turnPower));
+
+        robot.drive.driveRobotCentric(strafePower, forwardPower, turnPower);
+
+        PEX = errorX; PEY = errorY; PEYAW = errorYaw;
+    }
+
+    private boolean xInchRadius(AprilTagProcessor tagProcessor, int num) {
+        int xInches = num;
+        ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
+
+        for (int i = 0; i < detections.size(); i++) {
+            AprilTagDetection tag = detections.get(i);
+            if (tag.id == 1 || tag.id == 2 || tag.id == 3) {
+                double x = tag.ftcPose.x;
+                double y = tag.ftcPose.y;
+                double distance = Math.sqrt((x * x) + (y * y));
+                if (distance <= xInches) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 
