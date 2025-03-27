@@ -46,9 +46,17 @@ public class indepSubsystem extends SubsystemBase {
         LOWCLAW.setLeftLiftDirection(ROBOTCONSTANTS.LIFTUPCONST);
         LOWCLAW.setRightLiftDirection(ROBOTCONSTANTS.LIFTUPCONST);
     }
+    public void LiftUp(int x){//sets lift to go up at defined speed
+        LOWCLAW.setLeftLiftDirection(ROBOTCONSTANTS.LIFTUPCONST*x);
+        LOWCLAW.setRightLiftDirection(ROBOTCONSTANTS.LIFTUPCONST*x);
+    }
     public void LiftDown(){//sets lift to go down at max speed
         LOWCLAW.setLeftLiftDirection(ROBOTCONSTANTS.LIFTDOWNCONST);
         LOWCLAW.setRightLiftDirection(ROBOTCONSTANTS.LIFTDOWNCONST);
+    }
+    public void LiftDown(int x){//sets lift to go up at defined speed
+        LOWCLAW.setLeftLiftDirection(ROBOTCONSTANTS.LIFTDOWNCONST*x);
+        LOWCLAW.setRightLiftDirection(ROBOTCONSTANTS.LIFTDOWNCONST*x);
     }
     public  void SetLiftDir(int direction){
         LOWCLAW.setRightLiftDirection(direction);
