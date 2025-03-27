@@ -44,15 +44,12 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     public void runOpMode () throws InterruptedException {
         //define robot object
         this.robot = new RobotSystem(hardwareMap, this);
-        //ofc, tweak all of these
-        double clawClosed = 0;
-        double clawOpen = 1;
         //assuming elbow has infinite positions
         //ari also wanted this
-        double elbowPos = gamepad1.right_stick_y;
         //setting pos for claw and elbow
-        robot.inDep.closeClaw(); //test servo positions once accessible
-        robot.inDep.setElbowPos(elbowPos); //test servo pos as well
+        robot.inDep.closeClaw();
+        robot.inDep.setElbowPos(0);//test servo positions once accessible
+        // test servo pos as well
 
 
         //apriltag intialization
@@ -84,7 +81,6 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
             driveCommands();
-            elbowCommands();
             tags(tagProcessor);
             liftCommands();
             letterbuttons();
@@ -98,24 +94,13 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     //  ||          ||      ||          ||
     //  ======   ========   ||          ||
     public void liftCommands() {
-
         double triggerPower = (gamepad1.left_trigger - gamepad1.right_trigger);
-        int LiftPos = (int)triggerPower/ROBOTCONSTANTS.TRIGGERMAX;
-        if(gamepad1.cross) {//down
-            robot.inDep.LiftDown();
-        }
-        else if(gamepad1.triangle) {//up
-            robot.inDep.LiftUp();
-        }
-        else {
-            robot.inDep.SetLiftDir(LiftPos);
-        }
-    }
-    public void elbowCommands() {
-
-        double triggerpower = gamepad1.right_stick_y;
-        double elbow = triggerpower/ROBOTCONSTANTS.ELBOWCONST;
-        robot.inDep.adjustElbowPos(elbow);
+        double leftLiftPower = 0;
+        double rightLiftPower = 0;
+        leftLiftPower += triggerPower;
+        rightLiftPower += triggerPower;
+        robot.inDep.setLiftPos(triggerPower);
+        //make lift up and lift down macros if needed - viir has them already
     }
     public void driveCommands() {
         double speed = 1;
@@ -126,27 +111,25 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     }
     
     public void letterbuttons(){
-
-            if (gamepad1.triangle) {
-                //launch drone?
-            }
-            if (gamepad1.circle && !toggleClaw) {
+        double elbowpower = gamepad1.right_stick_y;
+        robot.inDep.setElbowPos(elbowpower);
+        if (gamepad1.circle && !toggleClaw) {
                 toggleClaw = true;
                 claw = !claw;
             }
-            if (!gamepad1.circle) {
+        if (!gamepad1.circle) {
                 toggleClaw = false;
             }
-            if (claw) {
+        if (claw) {
                 robot.inDep.closeClaw();
-            } else {
+        } else {
                 robot.inDep.openClaw();
             }
-            if(gamepad1.cross){
-                //see lift
+        if(gamepad1.cross){
+                //lift up macro
             }
-            if(gamepad1.triangle) {
-                //see lift
+        if(gamepad1.triangle) {
+                //lift down macro
             }
 
     }
