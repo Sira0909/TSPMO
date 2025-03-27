@@ -10,7 +10,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
-
+//if a new apriltag class needs to be create, use this.
 public class aprilTagsTemplate extends LinearOpMode {
     public void aprilTagDetect(AprilTagProcessor tagProcessor) {
         if (true) {

@@ -13,7 +13,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
-
+//do not use this, MAIN AUTO IS SPECIFIEDPOSAUTO
 //this will allow movement from position relative to apriltag to another position relative to that apriltag
 public class apriltagPDrelativetotags extends LinearOpMode {
     public void aprilTagDetect(AprilTagProcessor tagProcessor) {
@@ -80,8 +80,6 @@ public class apriltagPDrelativetotags extends LinearOpMode {
             double robotfieldrelativex = robotrelativex*Math.cos(radangle)+robotrelativey*Math.sin(radangle);
             double robotfieldrelativey = robotrelativey*Math.cos(radangle)-robotrelativex*Math.sin(radangle);
             //dont ask why that works i dont know. it just does. something about trig i think.
-
-            tag.robotPose.getPosition().x
             double robotfieldx = tag.metadata.fieldPosition.get(0)+robotfieldrelativex;
             double robotfieldy = apriltagpositions[1]+robotfieldrelativey;
 
@@ -95,49 +93,6 @@ public class apriltagPDrelativetotags extends LinearOpMode {
         }
         return new double[] {avgx,avgy};
     }
-    //target coords are relative to bottom left corner.
-//    public void changepositionrelativetotag(AprilTagProcessor tagProcessor, int tagid, int targetxonfield, int targetyonfield,double guessstartx, double guessstarty){
-//        double GOALERROR = 0.01;
-//        double KP = 0.01;
-//        double KD = 0.001;
-//        Double[] currentposrelative = getposrelativetoapriltag(tagProcessor,tagid);
-//        if(currentposrelative==null){currentposrelative = new Double[]{guessstartx,guessstarty};}
-//        Double currenterror = Math.hypot(Math.abs(currentposrelative[0]-targetx),Math.abs(currentposrelative[1]-targetrange));
-//        Double errorlist[] = {currenterror,currenterror,currenterror,currenterror,currenterror,currenterror,currenterror,currenterror,currenterror,currenterror};
-//        ElapsedTime runtime = new ElapsedTime(0);
-//        double timelist[] = {runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds(),runtime.seconds()};
-//        double lastD;
-//        while (currenterror>GOALERROR){
-//
-//
-//            //NOTE: I HAD AN IDEA FOR HOW TO DO THIS, FEEL FREE TO CHANGE AND OR REMOVE. THE METHOD
-//            //I WAS WRITING IS UNFINISHED, DONT TRUST IT
-//
-//
-//
-//            currentposrelative = getposrelativetoapriltag(tagProcessor,tagid);
-//            if(currentposrelative==null){currenterror=null;}else{
-//            currenterror = Math.hypot(Math.abs(currentposrelative[0]-targetx),Math.abs(currentposrelative[1]-targetrange));}
-//            ArrayList<Integer> validtags= new ArrayList<Integer>();
-//            for (int i = 0;i<errorlist.length-1;i++){
-//                errorlist[i]=errorlist[i+1];
-//                if(errorlist[i]!=null){validtags.add(i);}
-//                timelist[i]=timelist[i+1];
-//            }
-//            errorlist[errorlist.length-1]=currenterror;
-//            if(currentposrelative!=null){validtags.add(errorlist.length);}
-//
-//            timelist[timelist.length]=runtime.seconds();
-//
-//            if(validtags.size()>=5){
-//
-//            }
-//
-//
-//
-//        }
-//
-//    }
 
     @Override
     public void runOpMode() throws InterruptedException {
