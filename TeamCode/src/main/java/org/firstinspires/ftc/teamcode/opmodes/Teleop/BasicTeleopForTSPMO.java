@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
@@ -23,7 +24,7 @@ import java.util.List;
 //adding documentation and fixing apriltag stuff - viir 3/20
 public class BasicTeleopForTSPMO extends LinearOpMode {
 
-//creates robot as object of compiled robotsystem class w all subsystems
+    //creates robot as object of compiled robotsystem class w all subsystems
     //  ======    |\\    ||  ======  =========
     //    ||      ||\\   ||    ||       ||
     //    ||      || \\  ||    ||       ||
@@ -34,14 +35,14 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
     boolean toggleClaw = false;
     boolean claw = true;
-    private final RobotConstants ROBOTCONSTANTS=new RobotConstants();
+    private final RobotConstants ROBOTCONSTANTS = new RobotConstants();
 
     private double PEX = 0;
     private double PEY = 0;
     private double PEYAW = 0;
 
     @Override
-    public void runOpMode () throws InterruptedException {
+    public void runOpMode() throws InterruptedException {
         //define robot object
         this.robot = new RobotSystem(hardwareMap, this);
         //assuming elbow has infinite positions
@@ -71,7 +72,6 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
                 .build();
 
 
-
         //  /=====    ========        /\       |====\    ========
         // |             ||          //\\      |     |      ||
         //  \====\       ||         //  \\     |====/       ||
@@ -81,7 +81,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
             driveCommands();
-            tags(tagProcessor);
+            driveToTag(tagProcessor,1, 100, 60); //replace ofc w desired
             liftCommands();
             letterbuttons();
         }
@@ -95,13 +95,10 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     //  ======   ========   ||          ||
     public void liftCommands() {
         double triggerPower = (gamepad1.left_trigger - gamepad1.right_trigger);
-        double leftLiftPower = 0;
-        double rightLiftPower = 0;
-        leftLiftPower += triggerPower;
-        rightLiftPower += triggerPower;
         robot.inDep.setLiftPos(triggerPower);
         //make lift up and lift down macros if needed - viir has them already
     }
+
     public void driveCommands() {
         double speed = 1;
         double strafe = gamepad1.left_stick_x;
@@ -109,75 +106,74 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         double turn = gamepad1.right_stick_x;
         robot.drive.driveRobotCentric(strafe * speed, forward * speed, turn * speed);
     }
-    
-    public void letterbuttons(){
+
+    public void letterbuttons() {
         double elbowpower = gamepad1.right_stick_y;
         robot.inDep.setElbowPos(elbowpower);
         if (gamepad1.circle && !toggleClaw) {
-                toggleClaw = true;
-                claw = !claw;
-            }
+            toggleClaw = true;
+            claw = !claw;
+        }
         if (!gamepad1.circle) {
-                toggleClaw = false;
-            }
+            toggleClaw = false;
+        }
         if (claw) {
-                robot.inDep.closeClaw();
+            robot.inDep.closeClaw();
         } else {
-                robot.inDep.openClaw();
-            }
-        if(gamepad1.cross){
-                //lift up macro
-            }
-        if(gamepad1.triangle) {
-                //lift down macro
-            }
+            robot.inDep.openClaw();
+        }
+        if (gamepad1.cross) {
+            //lift up macro
+        }
+        if (gamepad1.triangle) {
+            //lift down macro
+        }
 
     }
 
-//method for detection
-public void tags(AprilTagProcessor tagProcessor){
-    if (gamepad1.circle) { // Note: this will only move towards board while circle is held
-        ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
-        AprilTagDetection target = null;
-        if (!detections.isEmpty()) {
-            for (AprilTagDetection tag : detections) {
-                telemetry.addLine(String.format("XYZ %6.2f %6.2f %6.2f", tag.ftcPose.x, tag.ftcPose.y, tag.ftcPose.z));
-                if (tag.id == 1 || tag.id == 2 || tag.id == 3) { // Blue alliance tags
-                    target = tag;
-                    break;
+    //method for detection
+    public void driveToTag(AprilTagProcessor tagProcessor, int tagid, int tagFieldX, int tagFieldY) {
+        if (gamepad1.circle) { // Note: this will only move towards board while circle is held
+            ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
+            if (!detections.isEmpty()) {
+                for (AprilTagDetection tag : detections) {
+                    double robotFieldX = tag.robotPose.getPosition().x;
+                    double robotFieldY = tag.robotPose.getPosition().y;
+                    if (tag.id == tagid) { // Blue alliance tags
+                        double kP = 0.1;
+                        double kD = 0.01; // Tune these obv
+
+                        double errorX = tagFieldX - robotFieldX;
+                        double errorY = tagFieldY - robotFieldY;
+                        double previousErrorX = 0;
+                        double previousErrorY = 0;
+                        ElapsedTime timer = new ElapsedTime();
+                        while (Math.hypot(errorX, errorY) > 0.5) {  // 0.5 is an acceptable error threshold
+                            double deltaTime = timer.seconds();
+                            timer.reset();
+
+                            // PD Control
+                            double derivativeX = (errorX - previousErrorX) / deltaTime;
+                            double derivativeY = (errorY - previousErrorY) / deltaTime;
+
+                            double powerX = kP * errorX + kD * derivativeX;
+                            double powerY = kP * errorY + kD * derivativeY;
+
+                            robot.drive.driveRobotCentric(powerX, powerY, 0);
+
+                            previousErrorX = errorX;
+                            previousErrorY = errorY;
+
+                            errorX = tagFieldX - robotFieldX;
+                            errorY = tagFieldY - robotFieldY;
+                        }
+                    }
                 }
             }
         }
-        if (target != null) {
-            PDcontroller(target);
-        }
     }
 }
-    public void PDcontroller (AprilTagDetection target){
-        double kP = 0.1; double kD = 0.01; // Tune these obv
 
-        double errorX = target.ftcPose.x;
-        double errorY = target.ftcPose.y - 1; // subtract 1 bc we dont wanna crash into the tag
-        double errorYaw = target.ftcPose.yaw;
-
-        double derivativeX = errorX -PEX ;
-        double derivativeY = errorY - PEY;
-        double derivativeYaw = errorYaw - PEYAW;
-
-        double strafePower = kP * errorX + kD * derivativeX;
-        double forwardPower = kP * errorY + kD * derivativeY;
-        double turnPower = kP * errorYaw + kD * derivativeYaw;
-
-        //CONVERTING STRafe FORWARD AND TUIRN POWER INTO -1 to 1 range
-        strafePower = Math.max(-1, Math.min(1, strafePower));
-        forwardPower = Math.max(-1, Math.min(1, forwardPower));
-        turnPower = Math.max(-1, Math.min(1, turnPower));
-
-        robot.drive.driveRobotCentric(strafePower, forwardPower, turnPower);
-
-        PEX = errorX; PEY = errorY; PEYAW = errorYaw;
-    }
-}
 
 
 
