@@ -21,10 +21,8 @@ import org.openftc.apriltag.AprilTagPose;
 import java.util.ArrayList;
 import java.util.List;
 
-//adding documentation and fixing apriltag stuff - viir 3/20
 public class BasicTeleopForTSPMO extends LinearOpMode {
 
-    //creates robot as object of compiled robotsystem class w all subsystems
     //  ======    |\\    ||  ======  =========
     //    ||      ||\\   ||    ||       ||
     //    ||      || \\  ||    ||       ||
@@ -40,31 +38,19 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        //define robot object
         this.robot = new RobotSystem(hardwareMap, this);
-        //assuming elbow has infinite positions
-        //ari also wanted this
-        //setting pos for claw and elbow
         robot.inDep.closeClaw();
         robot.inDep.setElbowPos(0);//test servo positions once accessible
-        // test servo pos as well
-
-
         //apriltag intialization
-        AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder() //creates object of processor class for detection\
-                //calling set up methods - drawing and mapping out possible predicted tags
+        AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)
                 .setDrawCubeProjection(true)
                 .setDrawTagID(true)
                 .setDrawTagOutline(true)
-                //build intializes all of these
                 .build();
-        VisionPortal visionPortal = new VisionPortal.Builder() //actual cv program built in
-                //adding processor inside of camera display to detect tags
+        VisionPortal visionPortal = new VisionPortal.Builder()
                 .addProcessor(tagProcessor)
-                //adding cam to do the actual detection
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                //setting cam positions
                 .setCameraResolution(new Size(640, 480)) // place holder values ask for real size
                 .build();
 
@@ -93,7 +79,6 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     public void liftCommands() {
         double triggerPower = (gamepad1.left_trigger - gamepad1.right_trigger);
         robot.inDep.setLiftPos(triggerPower);
-        //make lift up and lift down macros if needed - viir has them already
     }
 
     public void driveCommands() {
@@ -106,6 +91,11 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
     public void letterbuttons() {
         double elbowpower = gamepad1.right_stick_y;
+        boolean liftUpMacroRunning = false;
+        boolean liftDownMacroRunning = false;
+        boolean toggleLiftUpMacro = false;
+        boolean toggleLiftDownMacro = false;
+        double targetPos = 0;
         robot.inDep.setElbowPos(elbowpower);
         if (gamepad1.circle && !toggleClaw) {
             toggleClaw = true;
@@ -119,11 +109,23 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         } else {
             robot.inDep.openClaw();
         }
-        if (gamepad1.cross) {
-            //lift up macro
+        if (gamepad1.cross && !toggleLiftUpMacro) {
+            toggleLiftUpMacro = true;
+            liftUpMacroRunning = true;
+            toggleLiftDownMacro = true;
         }
-        if (gamepad1.triangle) {
-            //lift down macro
+        if (liftUpMacroRunning) {
+            liftDownMacroRunning = false;
+            targetPos = 1350;
+        }
+        if (gamepad1.triangle && !toggleLiftDownMacro) {
+            toggleLiftDownMacro = true;
+            liftDownMacroRunning = true;
+            toggleLiftUpMacro = true;
+        }
+        if (liftDownMacroRunning) {
+            liftUpMacroRunning = false;
+            targetPos = -10;
         }
 
     }
@@ -176,7 +178,3 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         }
     }
 }
-
-
-
-
