@@ -33,10 +33,10 @@ public class LowClawSubsystem extends SubsystemBase {
         HARDWARE_ROBOT.claw.setPosition(clawPos);
     }
 
-    public void setLeftLiftDirection(int leftLiftUp) {
-        HARDWARE_ROBOT.leftLift.setTargetPosition(leftLiftUp); //tune
+    public void setRightLift(double rightLift) {
+        HARDWARE_ROBOT.rightLift.set(rightLift);
     }
-    public void setRightLiftDirection(int rightLiftUp) {
-        HARDWARE_ROBOT.rightLift.setTargetPosition(rightLiftUp); //tune
+    public void setLeftLift(double leftLift) {
+        HARDWARE_ROBOT.leftLift.set(leftLift);
     }
 }
