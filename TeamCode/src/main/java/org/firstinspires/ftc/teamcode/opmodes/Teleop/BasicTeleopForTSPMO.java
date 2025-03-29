@@ -36,9 +36,6 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     private final RobotConstants ROBOTCONSTANTS = new RobotConstants();
 
 
-    private double PEX = 0;
-    private double PEY = 0;
-    private double PEYAW = 0;
 
 
 
@@ -69,9 +66,12 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
-
+            driveCommands();
             liftCommands();
             letterbuttons();
+            if (gamepad1.square) {
+                driveToTag(tagProcessor,1,60,100);
+            }
         }
     }
 
@@ -134,37 +134,43 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
         }
 
     }
+    public void driveToTag(AprilTagProcessor tagProcessor, int tagid, double tagFieldX, double tagFieldY) {
+        double kP = 0.1;
+        double kD = 0.01; // Tune these obv
+        List<AprilTagDetection> detections = tagProcessor.getDetections();
+        for (AprilTagDetection tag : detections) {
+            if (tagid == tag.id) {
+                double errorX = tagFieldX - tag.robotPose.getPosition().x;
+                double errorY = tagFieldY - tag.robotPose.getPosition().y;
+                double errorAngle = tag.ftcPose.bearing;
+                double previousErrorX = 0; //tune
+                double previousErrorY = 0; //tune
+                double previousErrorAngle = 0; //tune
+                ElapsedTime timer = new ElapsedTime();
+                while (Math.hypot(errorX, errorY) > 0.5) {  // 0.5 is an acceptable error threshold
+                    double deltaTime = timer.seconds();
+                    timer.reset();
 
+                    // PD Control
+                    double derivativeX = (errorX - previousErrorX) / deltaTime;
+                    double derivativeY = (errorY - previousErrorY) / deltaTime;
+                    double derivativeAngle = (errorAngle - previousErrorAngle) / deltaTime;
+
+                    double powerX = kP * errorX + kD * derivativeX;
+                    double powerY = kP * errorY + kD * derivativeY;
+                    double powerTurn = kP * errorAngle + kD * derivativeAngle;
+
+                    robot.drive.driveRobotCentric(powerX, powerY, powerTurn);
+
+                    previousErrorX = errorX;
+                    previousErrorY = errorY;
+                    previousErrorAngle = errorAngle;
+
+                    errorX = tagFieldX - tag.robotPose.getPosition().x;
+                    errorY = tagFieldY - tag.robotPose.getPosition().y;
+                    errorAngle = tag.ftcPose.bearing;
                 }
             }
         }
-        if (target != null) {
-            PDcontroller(target);
-        }
-    }
-}
-    public void PDcontroller(AprilTagDetection target){
-        double kP = 0.1; double kD = 0.01; // Tune these obv
-
-        double errorX = target.ftcPose.x;
-        double errorY = target.ftcPose.y - 1; // subtract 1 bc we dont wanna crash into the tag
-        double errorYaw = target.ftcPose.yaw;
-
-        double derivativeX = errorX -PEX ;
-        double derivativeY = errorY - PEY;
-        double derivativeYaw = errorYaw - PEYAW;
-
-        double strafePower = kP * errorX + kD * derivativeX;
-        double forwardPower = kP * errorY + kD * derivativeY;
-        double turnPower = kP * errorYaw + kD * derivativeYaw;
-
-        //CONVERTING STRafe FORWARD AND TUIRN POWER INTO -1 to 1 range
-        strafePower = Math.max(-1, Math.min(1, strafePower));
-        forwardPower = Math.max(-1, Math.min(1, forwardPower));
-        turnPower = Math.max(-1, Math.min(1, turnPower));
-
-        robot.drive.driveRobotCentric(strafePower, forwardPower, turnPower);
-
-        PEX = errorX; PEY = errorY; PEYAW = errorYaw;
     }
 }

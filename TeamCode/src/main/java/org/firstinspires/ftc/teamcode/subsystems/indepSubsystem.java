@@ -34,6 +34,9 @@ public class indepSubsystem extends SubsystemBase {
     public void closeClaw(){
         LOWCLAW.setClawPos(ROBOTCONSTANTS.CLOSECLAW);
     }
+    public void setLiftPos(double position) {
+        LOWCLAW.setLeftLift(position);
+        LOWCLAW.setRightLift(position);
+    }
 
     }
-}
