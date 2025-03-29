@@ -36,6 +36,12 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     private final RobotConstants ROBOTCONSTANTS = new RobotConstants();
 
 
+    private double PEX = 0;
+    private double PEY = 0;
+    private double PEYAW = 0;
+
+
+
     @Override
     public void runOpMode() throws InterruptedException {
         this.robot = new RobotSystem(hardwareMap, this);
@@ -63,8 +69,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
-            driveCommands();
-            driveToTag(tagProcessor,1, 100, 60); //replace ofc w desired
+
             liftCommands();
             letterbuttons();
         }
@@ -130,51 +135,36 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
     }
 
-    //method for detection
-    public void driveToTag(AprilTagProcessor tagProcessor, int tagid, int tagFieldX, int tagFieldY) {
-        if (gamepad1.circle) { // Note: this will only move towards board while circle is held
-            ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
-            if (!detections.isEmpty()) {
-                for (AprilTagDetection tag : detections) {
-                    double robotFieldX = tag.robotPose.getPosition().x;
-                    double robotFieldY = tag.robotPose.getPosition().y;
-                    if (tag.id == tagid) { // Blue alliance tags
-                        double kP = 0.1;
-                        double kD = 0.01; // Tune these obv
-
-                        double errorX = tagFieldX - robotFieldX;
-                        double errorY = tagFieldY - robotFieldY;
-                        double errorAngle = tag.ftcPose.bearing;
-                        double previousErrorX = 0;
-                        double previousErrorY = 0;
-                        double previousErrorAngle = 0;
-                        ElapsedTime timer = new ElapsedTime();
-                        while (Math.hypot(errorX, errorY) > 0.5) {  // 0.5 is an acceptable error threshold
-                            double deltaTime = timer.seconds();
-                            timer.reset();
-
-                            // PD Control
-                            double derivativeX = (errorX - previousErrorX) / deltaTime;
-                            double derivativeY = (errorY - previousErrorY) / deltaTime;
-                            double derivativeAngle = (errorAngle - previousErrorAngle) /deltaTime;
-
-                            double powerX = kP * errorX + kD * derivativeX;
-                            double powerY = kP * errorY + kD * derivativeY;
-                            double powerTurn = kP * errorAngle + kD * derivativeAngle;
-
-                            robot.drive.driveRobotCentric(powerX, powerY, powerTurn);
-
-                            previousErrorX = errorX;
-                            previousErrorY = errorY;
-                            previousErrorAngle = errorAngle;
-
-                            errorX = tagFieldX - robotFieldX;
-                            errorY = tagFieldY - robotFieldY;
-                            errorAngle = tag.ftcPose.bearing;
-                        }
-                    }
                 }
             }
         }
+        if (target != null) {
+            PDcontroller(target);
+        }
+    }
+}
+    public void PDcontroller(AprilTagDetection target){
+        double kP = 0.1; double kD = 0.01; // Tune these obv
+
+        double errorX = target.ftcPose.x;
+        double errorY = target.ftcPose.y - 1; // subtract 1 bc we dont wanna crash into the tag
+        double errorYaw = target.ftcPose.yaw;
+
+        double derivativeX = errorX -PEX ;
+        double derivativeY = errorY - PEY;
+        double derivativeYaw = errorYaw - PEYAW;
+
+        double strafePower = kP * errorX + kD * derivativeX;
+        double forwardPower = kP * errorY + kD * derivativeY;
+        double turnPower = kP * errorYaw + kD * derivativeYaw;
+
+        //CONVERTING STRafe FORWARD AND TUIRN POWER INTO -1 to 1 range
+        strafePower = Math.max(-1, Math.min(1, strafePower));
+        forwardPower = Math.max(-1, Math.min(1, forwardPower));
+        turnPower = Math.max(-1, Math.min(1, turnPower));
+
+        robot.drive.driveRobotCentric(strafePower, forwardPower, turnPower);
+
+        PEX = errorX; PEY = errorY; PEYAW = errorYaw;
     }
 }
