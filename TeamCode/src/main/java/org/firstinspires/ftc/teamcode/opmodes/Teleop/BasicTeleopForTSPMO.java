@@ -37,9 +37,6 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     boolean claw = true;
     private final RobotConstants ROBOTCONSTANTS = new RobotConstants();
 
-    private double PEX = 0;
-    private double PEY = 0;
-    private double PEYAW = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -145,8 +142,10 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
                         double errorX = tagFieldX - robotFieldX;
                         double errorY = tagFieldY - robotFieldY;
+                        double errorAngle = tag.ftcPose.bearing;
                         double previousErrorX = 0;
                         double previousErrorY = 0;
+                        double previousErrorAngle = 0;
                         ElapsedTime timer = new ElapsedTime();
                         while (Math.hypot(errorX, errorY) > 0.5) {  // 0.5 is an acceptable error threshold
                             double deltaTime = timer.seconds();
@@ -155,17 +154,21 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
                             // PD Control
                             double derivativeX = (errorX - previousErrorX) / deltaTime;
                             double derivativeY = (errorY - previousErrorY) / deltaTime;
+                            double derivativeAngle = (errorAngle - previousErrorAngle) /deltaTime;
 
                             double powerX = kP * errorX + kD * derivativeX;
                             double powerY = kP * errorY + kD * derivativeY;
+                            double powerTurn = kP * errorAngle + kD * derivativeAngle;
 
-                            robot.drive.driveRobotCentric(powerX, powerY, 0);
+                            robot.drive.driveRobotCentric(powerX, powerY, powerTurn);
 
                             previousErrorX = errorX;
                             previousErrorY = errorY;
+                            previousErrorAngle = errorAngle;
 
                             errorX = tagFieldX - robotFieldX;
                             errorY = tagFieldY - robotFieldY;
+                            errorAngle = tag.ftcPose.bearing;
                         }
                     }
                 }
