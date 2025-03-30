@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -11,9 +10,9 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-import java.util.ArrayList;
 import java.util.List;
-public class USETHISSPECIFIEDPOSAUTO extends LinearOpMode {
+
+public class USETHISSPECIFIEDPOSAUTO_Blue extends LinearOpMode {
     public RobotSystem robot;
     //vision portal and processor initialization
     AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()

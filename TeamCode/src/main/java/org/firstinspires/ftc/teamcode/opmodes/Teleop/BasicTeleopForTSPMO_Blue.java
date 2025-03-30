@@ -1,28 +1,20 @@
 package org.firstinspires.ftc.teamcode.opmodes.Teleop;
 
-import android.graphics.Canvas;
 import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
-import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.RobotConstants;
 import org.firstinspires.ftc.teamcode.RobotSystem;
-import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.opencv.core.Mat;
-import org.openftc.apriltag.AprilTagPose;
 
 import java.util.ArrayList;
-import java.util.List;
 
 //adding documentation and fixing apriltag stuff - viir 3/20
-public class BasicTeleopForTSPMO extends LinearOpMode {
+public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
 
     //creates robot as object of compiled robotsystem class w all subsystems
     //  ======    |\\    ||  ======  =========
@@ -157,7 +149,7 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
         double errorX = target.ftcPose.x;
         double errorY = target.ftcPose.y - 1; // subtract 1 bc we dont wanna crash into the tag
-        double errorYaw = target.ftcPose.yaw;
+        double errorYaw = target.ftcPose.bearing;
 
         double derivativeX = errorX -PEX ;
         double derivativeY = errorY - PEY;
