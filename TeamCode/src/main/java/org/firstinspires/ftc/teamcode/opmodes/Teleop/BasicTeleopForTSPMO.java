@@ -43,7 +43,6 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
     private double PEYAW = 0;
 
 
-
     @Override
     public void runOpMode() throws InterruptedException {
         //define robot object
@@ -83,9 +82,10 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
-
+            driveCommands();
             liftCommands();
             letterbuttons();
+            driveToTag(tagProcessor, 2);
         }
     }
 
@@ -133,68 +133,79 @@ public class BasicTeleopForTSPMO extends LinearOpMode {
 
     }
 
-    public void tags(AprilTagProcessor tagProcessor){
+    public void driveToTag(AprilTagProcessor tagProcessor, int tagid) {
         if (gamepad1.circle) { // Note: this will only move towards board while circle is held
             ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
             AprilTagDetection target = null;
             if (!detections.isEmpty()) {
                 for (AprilTagDetection tag : detections) {
                     telemetry.addLine(String.format("XYZ %6.2f %6.2f %6.2f", tag.ftcPose.x, tag.ftcPose.y, tag.ftcPose.z));
-                    if (tag.id == 1 || tag.id == 2 || tag.id == 3) { // Blue alliance tags
+                    if (tag.id == tagid) { // Blue alliance tags
                         target = tag;
                         break;
                     }
                 }
             }
             if (target != null) {
-                PDcontroller(target);
+                PDcontroller(target, 100, 60); //exammple
             }
         }
     }
 
-    public void PDcontroller (AprilTagDetection target){
-        double kP = 0.1; double kD = 0.01; // Tune these obv
+    public void PDcontroller(AprilTagDetection target, double targetFieldX, double targetFieldY) {
+        double kP = 0.1;
+        double kD = 0.01; // Tune these obv
+        double robotFieldX = target.robotPose.getPosition().x;
+        double robotFieldY = target.robotPose.getPosition().y;
+        double errorX = targetFieldX - robotFieldX;
+        double errorY = targetFieldY - robotFieldY;
+        double errorAngle = target.ftcPose.bearing;
+        double previousErrorX = 0;
+        double previousErrorY = 0;
+        double previousErrorAngle = 0;
+        ElapsedTime timer = new ElapsedTime();
+        while (Math.hypot(errorX, errorY) > 0.5) {  // 0.5 is an acceptable error threshold
+            double deltaTime = timer.seconds();
+            timer.reset();
 
-        double errorX = target.ftcPose.x;
-        double errorY = target.ftcPose.y - 1; // subtract 1 bc we dont wanna crash into the tag
-        double errorYaw = target.ftcPose.yaw;
+            // PD Control
+            double derivativeX = (errorX - previousErrorX) / deltaTime;
+            double derivativeY = (errorY - previousErrorY) / deltaTime;
+            double derivativeAngle = (errorAngle - previousErrorAngle) / deltaTime;
 
-        double derivativeX = errorX -PEX ;
-        double derivativeY = errorY - PEY;
-        double derivativeYaw = errorYaw - PEYAW;
+            double powerX = kP * errorX + kD * derivativeX;
+            double powerY = kP * errorY + kD * derivativeY;
+            double powerTurn = kP * errorAngle + kD * derivativeAngle;
 
-        double strafePower = kP * errorX + kD * derivativeX;
-        double forwardPower = kP * errorY + kD * derivativeY;
-        double turnPower = kP * errorYaw + kD * derivativeYaw;
+            robot.drive.driveRobotCentric(powerX, powerY, powerTurn);  // Replace with your robot’s drive method
 
-        //CONVERTING STRafe FORWARD AND TUIRN POWER INTO -1 to 1 range
-        strafePower = Math.max(-1, Math.min(1, strafePower));
-        forwardPower = Math.max(-1, Math.min(1, forwardPower));
-        turnPower = Math.max(-1, Math.min(1, turnPower));
+            previousErrorX = errorX;
+            previousErrorY = errorY;
+            previousErrorAngle = errorAngle;
 
-        robot.drive.driveRobotCentric(strafePower, forwardPower, turnPower);
-
-        PEX = errorX; PEY = errorY; PEYAW = errorYaw;
+            errorX = targetFieldX - robotFieldX;
+            errorY = targetFieldY - robotFieldY;
+            errorAngle = target.ftcPose.bearing;
+        }
     }
+        private boolean xInchRadius (AprilTagProcessor tagProcessor,int num){
+            int xInches = num;
+            ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
 
-    private boolean xInchRadius(AprilTagProcessor tagProcessor, int num) {
-        int xInches = num;
-        ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
-
-        for (int i = 0; i < detections.size(); i++) {
-            AprilTagDetection tag = detections.get(i);
-            if (tag.id == 1 || tag.id == 2 || tag.id == 3) {
-                double x = tag.ftcPose.x;
-                double y = tag.ftcPose.y;
-                double distance = Math.sqrt((x * x) + (y * y));
-                if (distance <= xInches) {
-                    return true;
+            for (int i = 0; i < detections.size(); i++) {
+                AprilTagDetection tag = detections.get(i);
+                if (tag.id == 1 || tag.id == 2 || tag.id == 3) {
+                    double x = tag.ftcPose.x;
+                    double y = tag.ftcPose.y;
+                    double distance = Math.sqrt((x * x) + (y * y));
+                    if (distance <= xInches) {
+                        return true;
+                    }
                 }
             }
+            return false;
         }
-        return false;
     }
-}
 
 
 
