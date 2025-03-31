@@ -97,24 +97,24 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
         double kP1 = 0.01;
         double liftTargetPosition = 0; //macro target pos to get lift to
         double triggerPower = gamepad1.right_trigger - gamepad1.left_trigger;
-        if (gamepad1.dpad_left && !toggleLU) {
+        if (gamepad1.dpad_up && !toggleLU) {
             toggleLU = true;
             liftTargetPosition = 1350;
             LURunning = true;
             LDRunning = false;
             robot.inDep.setElbowPos(1);
         }
-        if (!gamepad1.dpad_left) {
+        if (!gamepad1.dpad_up) {
             toggleLU = false;
         }
-        if (gamepad1.dpad_right && !toggleLD) {
+        if (gamepad1.dpad_down && !toggleLD) {
             liftTargetPosition = -10; //target pos aka up lift position
             LURunning = false;
             toggleLD = true;
             LDRunning = true;
             robot.inDep.setElbowPos(0);
         }
-        if (!gamepad1.dpad_right) {
+        if (!gamepad1.dpad_down) {
             toggleLD = false;
         }
         boolean triggerPressed = gamepad1.left_trigger != 0 || gamepad1.right_trigger != 0;
