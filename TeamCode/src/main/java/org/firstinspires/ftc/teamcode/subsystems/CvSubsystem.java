@@ -12,8 +12,10 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvPipeline;
+
 // THIS IS VERY BASIC IT WILL GET IMPROVED ON
-public class CvSubsystem implements VisionProcessor {
+public class CvSubsystem extends OpenCvPipeline implements VisionProcessor {
     //We need to implement the camera in a way that it can see all three lines on the ground
     //and it should be like equally split into threes
 
@@ -91,6 +93,11 @@ public class CvSubsystem implements VisionProcessor {
             prediction = propdetect.error;
             telemetry.addLine("nothing found :(");
         }
+        return null;
+    }
+
+    @Override
+    public Mat processFrame(Mat input) {
         return null;
     }
 

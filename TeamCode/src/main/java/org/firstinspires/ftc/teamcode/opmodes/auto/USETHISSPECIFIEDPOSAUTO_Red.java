@@ -6,29 +6,42 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.RobotSystem;
+import org.firstinspires.ftc.teamcode.subsystems.CvSubsystem;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
 
 import java.util.List;
 public class USETHISSPECIFIEDPOSAUTO_Red extends LinearOpMode {
     public RobotSystem robot;
     //vision portal and processor initialization
-    AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
-            .setDrawTagID(true)
-            .setDrawTagOutline(true)
-            .setDrawAxes(true)
-            .setDrawCubeProjection(true)
-            .build();
-    VisionPortal visionPortal = new VisionPortal.Builder()
-            .addProcessor(tagProcessor)
-            .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-            .setCameraResolution(new Size(640, 480))
-            .setStreamFormat(VisionPortal.StreamFormat.YUY2)
-            .build();
+    private CvSubsystem visionPipeline;
+    private OpenCvCamera camera;
 
     @Override
     public void runOpMode() throws InterruptedException {
+        AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .build();
+        VisionPortal visionPortal = new VisionPortal.Builder()
+                .addProcessor(tagProcessor)
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCameraResolution(new Size(640, 480))
+                .setStreamFormat(VisionPortal.StreamFormat.YUY2)
+                .build();
+        this.robot = new RobotSystem(hardwareMap, this);
+        CvSubsystem.setIsread(true);
+        int cameraMonitorViewId = hardwareMap.appContext.getResources()
+                .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        visionPipeline =  new CvSubsystem();
+        camera.setPipeline(visionPipeline);
         this.robot = new RobotSystem(hardwareMap, this);
         waitForStart();
         while (opModeIsActive()) {
@@ -68,7 +81,7 @@ public class USETHISSPECIFIEDPOSAUTO_Red extends LinearOpMode {
      */
     public void relativeDrive (AprilTagProcessor processor, int SpecTag, double tagFieldX, double tagFieldY, double targetFieldX, double targetFieldY) {
         //btw max coords are 144,144 (field is 12ft by 12ft)
-        List<AprilTagDetection> detection = tagProcessor.getDetections();
+        List<AprilTagDetection> detection = processor.getDetections();
         for (AprilTagDetection tag : detection) {
             if (tag.id == SpecTag) {
                 double robotFieldX = tag.robotPose.getPosition().x;
@@ -80,7 +93,7 @@ public class USETHISSPECIFIEDPOSAUTO_Red extends LinearOpMode {
                 double previousErrorX = 0;
                 double previousErrorY = 0;
                 ElapsedTime timer = new ElapsedTime();
-                while (Math.hypot(errorX, errorY) > 0.5) {  // 0.5 is an acceptable error threshold
+                while (opModeIsActive() && Math.hypot(errorX, errorY) > 0.5) {  // 0.5 is an acceptable error threshold
                     double deltaTime = timer.seconds();
                     timer.reset();
 
