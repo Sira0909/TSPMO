@@ -38,5 +38,7 @@ public class indepSubsystem extends SubsystemBase {
         LOWCLAW.setLeftLift(position);
         LOWCLAW.setRightLift(position);
     }
-
+    public double getLiftPos(){
+        return LOWCLAW.getLeftLift();
     }
+}

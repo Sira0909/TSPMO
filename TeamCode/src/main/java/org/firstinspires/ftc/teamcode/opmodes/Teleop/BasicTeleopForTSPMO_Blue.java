@@ -13,7 +13,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.ArrayList;
 
-//adding documentation and fixing apriltag stuff - viir 3/20
+//viirs update 3/31 - adding liftup and liftdown macros, closely follows how they did it in regular season code
+//also how are we gonna use xinchradius?
 public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
 
     //creates robot as object of compiled robotsystem class w all subsystems
@@ -75,22 +76,65 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
 
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
-
+            driveCommands();
             liftCommands();
-            letterbuttons();
+            letterButtons();
+            tags(tagProcessor);
         }
+
     }
-
-
     //  ||       ========   |======  ========
     //  ||          ||      ||          ||
     //  ||          ||      |=====      ||
     //  ||          ||      ||          ||
     //  ======   ========   ||          ||
     public void liftCommands() {
-        double triggerPower = (gamepad1.left_trigger - gamepad1.right_trigger);
-        robot.inDep.setElbowPos(triggerPower);
-        //make lift up and lift down macros if needed - viir has them already
+        double targetPos = 0;
+        boolean LURunning = false;
+        boolean LDRunning = false;
+        boolean toggleLU = false;
+        boolean toggleLD = false;
+        double kP1 = 0.01;
+        double liftTargetPosition = 0; //macro target pos to get lift to
+        double triggerPower = gamepad1.right_trigger - gamepad1.left_trigger;
+        if (gamepad1.dpad_left && !toggleLU) {
+            toggleLU = true;
+            liftTargetPosition = 1350;
+            LURunning = true;
+            LDRunning = false;
+            robot.inDep.setElbowPos(1);
+        }
+        if (!gamepad1.dpad_left) {
+            toggleLU = false;
+        }
+        if (gamepad1.dpad_right && !toggleLD) {
+            liftTargetPosition = -10; //target pos aka up lift position
+            LURunning = false;
+            toggleLD = true;
+            LDRunning = true;
+            robot.inDep.setElbowPos(0);
+        }
+        if (!gamepad1.dpad_right) {
+            toggleLD = false;
+        }
+        boolean triggerPressed = gamepad1.left_trigger != 0 || gamepad1.right_trigger != 0;
+        if (triggerPressed) {
+            LURunning = false;
+            LDRunning = false;
+        }
+        if (LURunning || LDRunning) {
+            double liftPosition = robot.inDep.getLiftPos();
+            double error = liftTargetPosition - liftPosition;
+            double u_t = kP1 * error;
+            robot.inDep.setLiftPos(u_t);
+            if (Math.abs(error) < 50) {
+                LURunning = false;
+                LDRunning = false;
+            }
+            //above stops the macro if error gets too small (lift is close to target pos)
+        } else {
+            robot.inDep.setLiftPos(triggerPower);
+        }
     }
 
     public void driveCommands() {
@@ -101,44 +145,9 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
         robot.drive.driveRobotCentric(strafe * speed, forward * speed, turn * speed);
     }
 
-    public void letterbuttons() {
-        double targetPos = 0;
-        boolean LURunning = false;
-        boolean LDRunning = false;
-        boolean toggleLU = false;
-        boolean toggleLD = false;
+    public void letterButtons() {
         double elbowpower = gamepad1.right_stick_y;
         robot.inDep.setElbowPos(elbowpower);
-        if (gamepad1.circle && !toggleClaw) {
-            toggleClaw = true;
-            claw = !claw;
-        }
-        if (!gamepad1.circle) {
-            toggleClaw = false;
-        }
-        if (claw) {
-            robot.inDep.closeClaw();
-        } else {
-            robot.inDep.openClaw();
-        }
-        if (gamepad1.cross && !toggleLU) {
-            toggleLU = true;
-            LURunning = true;
-        }
-        if (gamepad1.triangle && !toggleLD) {
-            toggleLD = true;
-            LDRunning = true;
-        }
-        if (LURunning) {
-            targetPos = 1350;
-            toggleLD = true;
-            LDRunning = false;
-        }
-        if (LDRunning) {
-            targetPos = -10;
-            LURunning = false;
-            toggleLU = false;
-        }
     }
 
     public void tags(AprilTagProcessor tagProcessor){
@@ -203,7 +212,3 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
         return false;
     }
 }
-
-
-
-

@@ -39,4 +39,9 @@ public class LowClawSubsystem extends SubsystemBase {
     public void setLeftLift(double leftLift) {
         HARDWARE_ROBOT.leftLift.set(leftLift);
     }
+    //only one side is needed bc they will always be the same
+    public double getLeftLift() {
+        double leftliftpos = HARDWARE_ROBOT.leftLift.getCurrentPosition();
+        return leftliftpos;
+    }
 }
