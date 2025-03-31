@@ -32,7 +32,7 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
 
     private double PEX = 0;
     private double PEY = 0;
-    private double PEYAW = 0;
+    private double PEBEARING = 0;
 
 
 
@@ -102,6 +102,11 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
     }
 
     public void letterbuttons() {
+        double targetPos = 0;
+        boolean LURunning = false;
+        boolean LDRunning = false;
+        boolean toggleLU = false;
+        boolean toggleLD = false;
         double elbowpower = gamepad1.right_stick_y;
         robot.inDep.setElbowPos(elbowpower);
         if (gamepad1.circle && !toggleClaw) {
@@ -116,13 +121,24 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
         } else {
             robot.inDep.openClaw();
         }
-        if (gamepad1.cross) {
-            //lift up macro
+        if (gamepad1.cross && !toggleLU) {
+            toggleLU = true;
+            LURunning = true;
         }
-        if (gamepad1.triangle) {
-            //lift down macro
+        if (gamepad1.triangle && !toggleLD) {
+            toggleLD = true;
+            LDRunning = true;
         }
-
+        if (LURunning) {
+            targetPos = 1350;
+            toggleLD = true;
+            LDRunning = false;
+        }
+        if (LDRunning) {
+            targetPos = -10;
+            LURunning = false;
+            toggleLU = false;
+        }
     }
 
     public void tags(AprilTagProcessor tagProcessor){
@@ -149,15 +165,15 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
 
         double errorX = target.ftcPose.x;
         double errorY = target.ftcPose.y - 1; // subtract 1 bc we dont wanna crash into the tag
-        double errorYaw = target.ftcPose.bearing;
+        double errorAngle = target.ftcPose.bearing;
 
         double derivativeX = errorX -PEX ;
         double derivativeY = errorY - PEY;
-        double derivativeYaw = errorYaw - PEYAW;
+        double derivativeAngle = errorAngle - PEBEARING;
 
         double strafePower = kP * errorX + kD * derivativeX;
         double forwardPower = kP * errorY + kD * derivativeY;
-        double turnPower = kP * errorYaw + kD * derivativeYaw;
+        double turnPower = kP * errorAngle + kD * derivativeAngle;
 
         //CONVERTING STRafe FORWARD AND TUIRN POWER INTO -1 to 1 range
         strafePower = Math.max(-1, Math.min(1, strafePower));
@@ -166,7 +182,7 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
 
         robot.drive.driveRobotCentric(strafePower, forwardPower, turnPower);
 
-        PEX = errorX; PEY = errorY; PEYAW = errorYaw;
+        PEX = errorX; PEY = errorY; PEBEARING = errorAngle;
     }
 
     private boolean xInchRadius(AprilTagProcessor tagProcessor, int num) {
