@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.RobotSystem;
-import org.firstinspires.ftc.teamcode.subsystems.CvSubsystem;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -35,7 +34,7 @@ public class USETHISSPECIFIEDPOSAUTO_Red extends LinearOpMode {
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2)
                 .build();
         this.robot = new RobotSystem(hardwareMap, this);
-        CvSubsystem.setIsread(true);
+        CvSubsystem.setIsRed(true);
         int cameraMonitorViewId = hardwareMap.appContext.getResources()
                 .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
