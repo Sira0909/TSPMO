@@ -28,6 +28,10 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
 
     boolean toggleClaw = false;
     boolean claw = true;
+    boolean LURunning = false;
+    boolean LDRunning = false;
+    boolean toggleLU = false;
+    boolean toggleLD = false;
     private final RobotConstants ROBOTCONSTANTS = new RobotConstants();
 
 
@@ -89,11 +93,6 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
     //  ||          ||      ||          ||
     //  ======   ========   ||          ||
     public void liftCommands() {
-        double targetPos = 0;
-        boolean LURunning = false;
-        boolean LDRunning = false;
-        boolean toggleLU = false;
-        boolean toggleLD = false;
         double kP1 = 0.01;
         double liftTargetPosition = 0; //macro target pos to get lift to
         double triggerPower = gamepad1.right_trigger - gamepad1.left_trigger;
@@ -127,11 +126,10 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
             double error = liftTargetPosition - liftPosition;
             double u_t = kP1 * error;
             robot.inDep.setLiftPos(u_t);
-            if (Math.abs(error) < 50) {
+            if (Math.abs(error) < 40) {
                 LURunning = false;
                 LDRunning = false;
             }
-            //above stops the macro if error gets too small (lift is close to target pos)
         } else {
             robot.inDep.setLiftPos(triggerPower);
         }
@@ -148,6 +146,19 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
     public void letterButtons() {
         double elbowpower = gamepad1.right_stick_y;
         robot.inDep.setElbowPos(elbowpower);
+        if (gamepad1.dpad_right && !toggleClaw) {
+            claw = !claw;
+            toggleClaw = true;
+        }
+        if (!gamepad1.dpad_right) {
+            toggleClaw = false;
+        }
+        if (claw) {
+            robot.inDep.closeClaw();
+        }
+        else {
+            robot.inDep.openClaw();
+        }
     }
 
     public void tags(AprilTagProcessor tagProcessor){
@@ -164,16 +175,16 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
                 }
             }
             if (target != null) {
-                PDcontroller(target);
+                PDcontroller(target, 100, 100);
             }
         }
     }
 
-    public void PDcontroller (AprilTagDetection target){
+    public void PDcontroller (AprilTagDetection target, double targetFX, double targetFY){
         double kP = 0.1; double kD = 0.01; // Tune these obv
 
-        double errorX = target.ftcPose.x;
-        double errorY = target.ftcPose.y - 1; // subtract 1 bc we dont wanna crash into the tag
+        double errorX = targetFX - target.robotPose.getPosition().x;
+        double errorY = targetFY - target.robotPose.getPosition().y;
         double errorAngle = target.ftcPose.bearing;
 
         double derivativeX = errorX -PEX ;
@@ -190,7 +201,9 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
         turnPower = Math.max(-1, Math.min(1, turnPower));
 
         robot.drive.driveRobotCentric(strafePower, forwardPower, turnPower);
-
+        errorX = targetFX - target.robotPose.getPosition().x;
+        errorY = targetFY - target.robotPose.getPosition().y;
+        errorAngle = target.ftcPose.bearing;
         PEX = errorX; PEY = errorY; PEBEARING = errorAngle;
     }
 
