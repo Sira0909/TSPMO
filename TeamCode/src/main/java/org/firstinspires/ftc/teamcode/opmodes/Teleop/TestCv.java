@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.opmodes.auto.CvSubsystem;
+import org.firstinspires.ftc.teamcode.opmodes.auto.CvPipline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -12,7 +12,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 @Autonomous(name="Test Vision Pipeline", group="Test")
 public class TestCv extends LinearOpMode {
     private OpenCvCamera camera;
-    private CvSubsystem visionPipeline;
+    private CvPipline visionPipeline;
 
     @Override
     public void runOpMode() {
@@ -20,7 +20,7 @@ public class TestCv extends LinearOpMode {
                 .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        visionPipeline = new CvSubsystem();
+        visionPipeline = new CvPipline();
         camera.setPipeline(visionPipeline);
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {

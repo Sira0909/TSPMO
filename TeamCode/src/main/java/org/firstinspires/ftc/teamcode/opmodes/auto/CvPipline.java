@@ -14,7 +14,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class CvSubsystem extends OpenCvPipeline implements VisionProcessor {
+public class CvPipline extends OpenCvPipeline implements VisionProcessor {
 
     private Rect leftSide;
     private Rect middle;
@@ -56,7 +56,6 @@ public class CvSubsystem extends OpenCvPipeline implements VisionProcessor {
             lowerUpper = new Scalar(130, 255, 255);
             lowerLower = new Scalar(110, 50, 50);
         }
-
         leftSide = new Rect(new Point(0, 0), new Point(0.33 * width, height));
         middle = new Rect(new Point(0.33 * width, 0), new Point(0.66 * width, height));
         rightSide = new Rect(new Point(0.66 * width, 0), new Point(width, height));
@@ -70,18 +69,15 @@ public class CvSubsystem extends OpenCvPipeline implements VisionProcessor {
 
     @Override
     public Mat processFrame(Mat frame) {
-        // Convert to HSV color space
-        Imgproc.cvtColor(frame, HSV, Imgproc.COLOR_BGR2HSV);
+        Imgproc.cvtColor(frame, HSV, 41);
         Core.inRange(HSV, upperLower, upperUpper, high);
         Core.inRange(HSV, lowerLower, lowerUpper, low);
         Core.bitwise_or(low, high, range);
 
-        // Calculate percentages for each region
         percentLeft = (Core.sumElems(range.submat(leftSide)).val[0] / leftSide.area()) * 100;
         percentRight = (Core.sumElems(range.submat(rightSide)).val[0] / rightSide.area()) * 100;
         percentMiddle = (Core.sumElems(range.submat(middle)).val[0] / middle.area()) * 100;
 
-        // Determine the prediction based on max detection
         if (percentLeft > percentMiddle && percentLeft > percentRight && percentLeft > min) {
             prediction = PropDetect.LEFT;
         } else if (percentMiddle > percentLeft && percentMiddle > percentRight && percentMiddle > min) {
@@ -95,7 +91,8 @@ public class CvSubsystem extends OpenCvPipeline implements VisionProcessor {
             }
         }
 
-        // Draw rectangles based on prediction
+        Imgproc.cvtColor(frame, frame, 55);
+
         if (prediction == PropDetect.LEFT) {
             Imgproc.rectangle(frame, leftSide, lowerUpper);
         } else if (prediction == PropDetect.MIDDLE) {

@@ -16,7 +16,7 @@ import java.util.List;
 public class USETHISSPECIFIEDPOSAUTO_Red extends LinearOpMode {
     public RobotSystem robot;
     //vision portal and processor initialization
-    private CvSubsystem visionPipeline;
+    private CvPipline visionPipeline;
     private OpenCvCamera camera;
 
     @Override
@@ -34,12 +34,12 @@ public class USETHISSPECIFIEDPOSAUTO_Red extends LinearOpMode {
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2)
                 .build();
         this.robot = new RobotSystem(hardwareMap, this);
-        CvSubsystem.setIsRed(true);
+        CvPipline.setIsRed(true);
         int cameraMonitorViewId = hardwareMap.appContext.getResources()
                 .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        visionPipeline =  new CvSubsystem();
+        visionPipeline =  new CvPipline();
         camera.setPipeline(visionPipeline);
         this.robot = new RobotSystem(hardwareMap, this);
         waitForStart();
