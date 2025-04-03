@@ -4,7 +4,6 @@ import android.util.Size;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.RobotSystem;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -18,7 +17,7 @@ import java.util.List;
 public class USETHISSPECIFIEDPOSAUTO_Blue extends LinearOpMode {
     public RobotSystem robot;
     //vision portal and processor initialization
-    private CvSubsystem visionPipeline;
+    private CvPipline visionPipeline;
     private OpenCvCamera camera;
 
 
@@ -37,12 +36,12 @@ public class USETHISSPECIFIEDPOSAUTO_Blue extends LinearOpMode {
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2)
                 .build();
         this.robot = new RobotSystem(hardwareMap, this);
-        CvSubsystem.setIsRed(false);
+        CvPipline.setIsRed(false);
         int cameraMonitorViewId = hardwareMap.appContext.getResources()
                 .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        visionPipeline =  new CvSubsystem();
+        visionPipeline =  new CvPipline();
         camera.setPipeline(visionPipeline);
 
 
