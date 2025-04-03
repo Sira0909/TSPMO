@@ -14,7 +14,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class CvSubsystem extends OpenCvPipeline implements VisionProcessor {
+public class CvSubsystem extends OpenCvPipeline {
 
     private Rect leftSide;
     private Rect middle;
@@ -43,7 +43,6 @@ public class CvSubsystem extends OpenCvPipeline implements VisionProcessor {
         isRed = x;
     }
 
-    @Override
     public void init(int width, int height, CameraCalibration calibration) {
         if (isRed) {
             upperUpper = new Scalar(180, 50, 50);
@@ -62,10 +61,6 @@ public class CvSubsystem extends OpenCvPipeline implements VisionProcessor {
         rightSide = new Rect(new Point(0.66 * width, 0), new Point(width, height));
     }
 
-    @Override
-    public Object processFrame(Mat frame, long captureTimeNanos) {
-        return null;
-    }
 
 
     @Override
