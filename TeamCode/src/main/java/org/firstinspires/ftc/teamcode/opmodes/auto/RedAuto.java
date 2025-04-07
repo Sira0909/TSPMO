@@ -14,11 +14,11 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 
 import java.util.List;
 
-public class USETHISSPECIFIEDPOSAUTO_Blue extends LinearOpMode {
+public class RedAuto extends LinearOpMode {
     public RobotSystem robot;
     //vision portal and processor initialization
-    private CvPipline visionPipeline;
-    private OpenCvCamera camera;
+    //private CvPipline visionPipeline;
+    //private OpenCvCamera camera;
 
 
     @Override
@@ -36,19 +36,20 @@ public class USETHISSPECIFIEDPOSAUTO_Blue extends LinearOpMode {
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2)
                 .build();
         this.robot = new RobotSystem(hardwareMap, this);
-        CvPipline.setIsRed(false);
-        int cameraMonitorViewId = hardwareMap.appContext.getResources()
-                .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        visionPipeline =  new CvPipline();
-        camera.setPipeline(visionPipeline);
+//        CvPipline.setIsRed(false);
+//        int cameraMonitorViewId = hardwareMap.appContext.getResources()
+//                .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//
+//        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+//        visionPipeline =  new CvPipline();
+//        camera.setPipeline(visionPipeline);
 
 
         waitForStart();
         while (opModeIsActive()) {
             aprilTagDetect(tagProcessor);
-            relativeDrive(tagProcessor, 6, 200, 700,100,100);
+            //test what patterns are needed and change this obv
+            relativeDrive(tagProcessor, 6,100,100);
         }
     }
 
@@ -71,7 +72,7 @@ public class USETHISSPECIFIEDPOSAUTO_Blue extends LinearOpMode {
         }
     }
 
-    /**info on field coordinate system:
+    /**Info on field coordinate system for tuning and real tests:
      * Origin
      * The 0,0,0 origin of the FIRST Tech Challenge coordinate system is the point in the center of the field, equidistant from all 4 perimeter walls (where the four center tiles meet). The origin point rests on the top surface of the floor mat.
      * X Axis
@@ -81,11 +82,10 @@ public class USETHISSPECIFIEDPOSAUTO_Blue extends LinearOpMode {
      * Z Axis
      * Looking at the origin from the Red Wall, the Z axis extends through the origin point and runs up and down in a vertical line. Increasing Z values extend upwards.
      */
-    public void relativeDrive (AprilTagProcessor processor, int SpecTag, double tagFieldX, double tagFieldY, double targetFieldX, double targetFieldY) {
-        //btw max coords are 144,144 (field is 12ft by 12ft)
+    public void relativeDrive (AprilTagProcessor processor, int TagID, double targetFieldX, double targetFieldY) {
         List<AprilTagDetection> detection = processor.getDetections();
         for (AprilTagDetection tag : detection) {
-            if (tag.id == SpecTag) {
+            if (tag.id == TagID) {
                 double robotFieldX = tag.robotPose.getPosition().x;
                 double robotFieldY = tag.robotPose.getPosition().y;
                 double errorX = targetFieldX - robotFieldX;
@@ -95,18 +95,16 @@ public class USETHISSPECIFIEDPOSAUTO_Blue extends LinearOpMode {
                 double previousErrorX = 0;
                 double previousErrorY = 0;
                 ElapsedTime timer = new ElapsedTime();
-                while (opModeIsActive() && Math.hypot(errorX, errorY) > 0.5) {  // 0.5 is an acceptable error threshold
+                while (opModeIsActive() && Math.hypot(errorX, errorY) > 0.5) {
                     double deltaTime = timer.seconds();
                     timer.reset();
-
-                    // PD Control
                     double derivativeX = (errorX - previousErrorX) / deltaTime;
                     double derivativeY = (errorY - previousErrorY) / deltaTime;
 
                     double powerX = kP * errorX + kD * derivativeX;
                     double powerY = kP * errorY + kD * derivativeY;
 
-                    robot.drive.driveRobotCentric(powerX, powerY, 0);  // Replace with your robot’s drive method
+                    robot.drive.driveRobotCentric(powerX, powerY, 0);
 
                     previousErrorX = errorX;
                     previousErrorY = errorY;

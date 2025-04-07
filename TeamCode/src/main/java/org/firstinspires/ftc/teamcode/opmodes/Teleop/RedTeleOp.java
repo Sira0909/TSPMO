@@ -13,9 +13,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.ArrayList;
 
-//viirs update 3/31 - adding liftup and liftdown macros, closely follows how they did it in regular season code
-//also how are we gonna use xinchradius?
-public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
+public class RedTeleOp extends LinearOpMode {
 
     //creates robot as object of compiled robotsystem class w all subsystems
     //  ======    |\\    ||  ======  =========
@@ -43,32 +41,22 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        //define robot object
         this.robot = new RobotSystem(hardwareMap, this);
-        //assuming elbow has infinite positions
-        //ari also wanted this
-        //setting pos for claw and elbow
         robot.inDep.closeClaw();
-        robot.inDep.setElbowPos(0);//test servo positions once accessible
-        // test servo pos as well
+        robot.inDep.setElbowPos(0);
 
 
-        //apriltag intialization
-        AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder() //creates object of processor class for detection\
-                //calling set up methods - drawing and mapping out possible predicted tags
+
+        AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)
                 .setDrawCubeProjection(true)
                 .setDrawTagID(true)
                 .setDrawTagOutline(true)
-                //build intializes all of these
                 .build();
-        VisionPortal visionPortal = new VisionPortal.Builder() //actual cv program built in
-                //adding processor inside of camera display to detect tags
+        VisionPortal visionPortal = new VisionPortal.Builder()
                 .addProcessor(tagProcessor)
-                //adding cam to do the actual detection
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                //setting cam positions
-                .setCameraResolution(new Size(640, 480)) // place holder values ask for real size
+                .setCameraResolution(new Size(640, 480))
                 .build();
 
 
@@ -180,11 +168,11 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
         }
     }
 
-    public void PDcontroller (AprilTagDetection target, double targetFX, double targetFY){
+    public void PDcontroller (AprilTagDetection target, double tagX, double tagY){
         double kP = 0.1; double kD = 0.01; // Tune these obv
 
-        double errorX = targetFX - target.robotPose.getPosition().x;
-        double errorY = targetFY - target.robotPose.getPosition().y;
+        double errorX = tagX - target.robotPose.getPosition().x;
+        double errorY = tagY - target.robotPose.getPosition().y;
         double errorAngle = target.ftcPose.bearing;
 
         double derivativeX = errorX -PEX ;
@@ -201,8 +189,8 @@ public class BasicTeleopForTSPMO_Blue extends LinearOpMode {
         turnPower = Math.max(-1, Math.min(1, turnPower));
 
         robot.drive.driveRobotCentric(strafePower, forwardPower, turnPower);
-        errorX = targetFX - target.robotPose.getPosition().x;
-        errorY = targetFY - target.robotPose.getPosition().y;
+        errorX = tagX - target.robotPose.getPosition().x;
+        errorY = tagY - target.robotPose.getPosition().y;
         errorAngle = target.ftcPose.bearing;
         PEX = errorX; PEY = errorY; PEBEARING = errorAngle;
     }
