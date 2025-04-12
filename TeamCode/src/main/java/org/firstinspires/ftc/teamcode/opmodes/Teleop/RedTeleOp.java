@@ -26,6 +26,7 @@ public class RedTeleOp extends LinearOpMode {
 
     boolean toggleClaw = false;
     boolean claw = true;
+    double speed = 1;
     boolean LURunning = false;
     boolean LDRunning = false;
     boolean toggleLU = false;
@@ -36,6 +37,7 @@ public class RedTeleOp extends LinearOpMode {
     private double PEX = 0;
     private double PEY = 0;
     private double PEBEARING = 0;
+    public AprilTagDetection currentTag = null;
 
 
 
@@ -71,7 +73,12 @@ public class RedTeleOp extends LinearOpMode {
             driveCommands();
             liftCommands();
             letterButtons();
-            tags(tagProcessor);
+            detectTags(tagProcessor);
+            if (gamepad1.right_bumper && currentTag.id == 3) {
+                tags(tagProcessor,3);
+            }
+            xInchRadius(tagProcessor, 3);
+            //or smth add more logic idk
         }
 
     }
@@ -124,7 +131,6 @@ public class RedTeleOp extends LinearOpMode {
     }
 
     public void driveCommands() {
-        double speed = 1;
         double strafe = gamepad1.left_stick_x;
         double forward = -gamepad1.left_stick_y;
         double turn = gamepad1.right_stick_x;
@@ -148,15 +154,29 @@ public class RedTeleOp extends LinearOpMode {
             robot.inDep.openClaw();
         }
     }
-
-    public void tags(AprilTagProcessor tagProcessor){
+    public void detectTags(AprilTagProcessor tagProcessor) {
+        ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
+        if (detections != null) {
+            for (AprilTagDetection tag: detections) {
+                //display info about all tags in view
+                telemetry.addData("X: ", tag.ftcPose.x);
+                telemetry.addData("Y: ", tag.ftcPose.y);
+                telemetry.addData("Bearing/Angle Error: ", tag.ftcPose.bearing);
+                telemetry.addData("Z: ", tag.ftcPose.z);
+                telemetry.addData("Robot X: ", tag.robotPose.getPosition().x);
+                telemetry.addData("Robot Y: ", tag.robotPose.getPosition().y);
+                telemetry.addData("Robot Z: ", tag.robotPose.getPosition().z);
+                currentTag = tag;
+            }
+        }
+    }
+    public void tags(AprilTagProcessor tagProcessor, int targetTag){
         if (gamepad1.circle) { // Note: this will only move towards board while circle is held
             ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
             AprilTagDetection target = null;
             if (!detections.isEmpty()) {
                 for (AprilTagDetection tag : detections) {
-                    telemetry.addLine(String.format("XYZ %6.2f %6.2f %6.2f", tag.ftcPose.x, tag.ftcPose.y, tag.ftcPose.z));
-                    if (tag.id == 1 || tag.id == 2 || tag.id == 3) { // Blue alliance tags
+                    if (tag.id == targetTag) {
                         target = tag;
                         break;
                     }
@@ -194,22 +214,17 @@ public class RedTeleOp extends LinearOpMode {
         errorAngle = target.ftcPose.bearing;
         PEX = errorX; PEY = errorY; PEBEARING = errorAngle;
     }
-
-    private boolean xInchRadius(AprilTagProcessor tagProcessor, int num) {
-        int xInches = num;
+    //xinch will reduce strain on driver so we dont mess up at stemtastic ig
+    //tune xinches to how much we want to slow down
+    public void xInchRadius(AprilTagProcessor tagProcessor, int xInches) {
         ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
-
-        for (int i = 0; i < detections.size(); i++) {
-            AprilTagDetection tag = detections.get(i);
-            if (tag.id == 1 || tag.id == 2 || tag.id == 3) {
-                double x = tag.ftcPose.x;
-                double y = tag.ftcPose.y;
-                double distance = Math.sqrt((x * x) + (y * y));
-                if (distance <= xInches) {
-                    return true;
-                }
+        for (AprilTagDetection tag: detections) {
+            double x = tag.ftcPose.x;
+            double y = tag.ftcPose.y;
+            double distance = Math.sqrt((x * x) + (y * y));
+            if (distance <= xInches) {
+                speed += 0.4;
             }
         }
-        return false;
     }
 }
