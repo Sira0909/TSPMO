@@ -13,9 +13,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.ArrayList;
 
-//viirs update 3/31 - adding liftup and liftdown macros, closely follows how they did it in regular season code
-//also how are we gonna use xinchradius?
-public class BasicTeleopForTSPMO_Red extends LinearOpMode {
+public class RedTeleOp extends LinearOpMode {
 
     //creates robot as object of compiled robotsystem class w all subsystems
     //  ======    |\\    ||  ======  =========
@@ -28,6 +26,7 @@ public class BasicTeleopForTSPMO_Red extends LinearOpMode {
 
     boolean toggleClaw = false;
     boolean claw = true;
+    double speed = 1;
     boolean LURunning = false;
     boolean LDRunning = false;
     boolean toggleLU = false;
@@ -38,37 +37,28 @@ public class BasicTeleopForTSPMO_Red extends LinearOpMode {
     private double PEX = 0;
     private double PEY = 0;
     private double PEBEARING = 0;
+    public AprilTagDetection currentTag = null;
 
 
 
     @Override
     public void runOpMode() throws InterruptedException {
-        //define robot object
         this.robot = new RobotSystem(hardwareMap, this);
-        //assuming elbow has infinite positions
-        //ari also wanted this
-        //setting pos for claw and elbow
         robot.inDep.closeClaw();
-        robot.inDep.setElbowPos(0);//test servo positions once accessible
-        // test servo pos as well
+        robot.inDep.setElbowPos(0);
 
 
-        //apriltag intialization
-        AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder() //creates object of processor class for detection\
-                //calling set up methods - drawing and mapping out possible predicted tags
+
+        AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)
                 .setDrawCubeProjection(true)
                 .setDrawTagID(true)
                 .setDrawTagOutline(true)
-                //build intializes all of these
                 .build();
-        VisionPortal visionPortal = new VisionPortal.Builder() //actual cv program built in
-                //adding processor inside of camera display to detect tags
+        VisionPortal visionPortal = new VisionPortal.Builder()
                 .addProcessor(tagProcessor)
-                //adding cam to do the actual detection
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                //setting cam positions
-                .setCameraResolution(new Size(640, 480)) // place holder values ask for real size
+                .setCameraResolution(new Size(640, 480))
                 .build();
 
 
@@ -83,7 +73,12 @@ public class BasicTeleopForTSPMO_Red extends LinearOpMode {
             driveCommands();
             liftCommands();
             letterButtons();
-            tags(tagProcessor);
+            detectTags(tagProcessor);
+            if (gamepad1.right_bumper && currentTag.id == 3) {
+                tags(tagProcessor,3);
+            }
+            xInchRadius(tagProcessor, 3);
+            //or smth add more logic idk
         }
 
     }
@@ -136,7 +131,6 @@ public class BasicTeleopForTSPMO_Red extends LinearOpMode {
     }
 
     public void driveCommands() {
-        double speed = 1;
         double strafe = gamepad1.left_stick_x;
         double forward = -gamepad1.left_stick_y;
         double turn = gamepad1.right_stick_x;
@@ -160,15 +154,29 @@ public class BasicTeleopForTSPMO_Red extends LinearOpMode {
             robot.inDep.openClaw();
         }
     }
-
-    public void tags(AprilTagProcessor tagProcessor){
+    public void detectTags(AprilTagProcessor tagProcessor) {
+        ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
+        if (detections != null) {
+            for (AprilTagDetection tag: detections) {
+                //display info about all tags in view
+                telemetry.addData("X: ", tag.ftcPose.x);
+                telemetry.addData("Y: ", tag.ftcPose.y);
+                telemetry.addData("Bearing/Angle Error: ", tag.ftcPose.bearing);
+                telemetry.addData("Z: ", tag.ftcPose.z);
+                telemetry.addData("Robot X: ", tag.robotPose.getPosition().x);
+                telemetry.addData("Robot Y: ", tag.robotPose.getPosition().y);
+                telemetry.addData("Robot Z: ", tag.robotPose.getPosition().z);
+                currentTag = tag;
+            }
+        }
+    }
+    public void tags(AprilTagProcessor tagProcessor, int targetTag){
         if (gamepad1.circle) { // Note: this will only move towards board while circle is held
             ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
             AprilTagDetection target = null;
             if (!detections.isEmpty() && opModeIsActive()) {
                 for (AprilTagDetection tag : detections) {
-                    telemetry.addLine(String.format("XYZ %6.2f %6.2f %6.2f", tag.ftcPose.x, tag.ftcPose.y, tag.ftcPose.z));
-                    if (tag.id == 1 || tag.id == 2 || tag.id == 3) { // Blue alliance tags
+                    if (tag.id == targetTag) {
                         target = tag;
                         break;
                     }
@@ -180,11 +188,11 @@ public class BasicTeleopForTSPMO_Red extends LinearOpMode {
         }
     }
 
-    public void PDcontroller (AprilTagDetection target, double targetFX, double targetFY){
+    public void PDcontroller (AprilTagDetection target, double tagX, double tagY){
         double kP = 0.1; double kD = 0.01; // Tune these obv
 
-        double errorX = targetFX - target.robotPose.getPosition().x;
-        double errorY = targetFY - target.robotPose.getPosition().y;
+        double errorX = tagX - target.robotPose.getPosition().x;
+        double errorY = tagY - target.robotPose.getPosition().y;
         double errorAngle = target.ftcPose.bearing;
 
         double derivativeX = errorX -PEX ;
@@ -201,27 +209,22 @@ public class BasicTeleopForTSPMO_Red extends LinearOpMode {
         turnPower = Math.max(-1, Math.min(1, turnPower));
 
         robot.drive.driveRobotCentric(strafePower, forwardPower, turnPower);
-        errorX = targetFX - target.robotPose.getPosition().x;
-        errorY = targetFY - target.robotPose.getPosition().y;
+        errorX = tagX - target.robotPose.getPosition().x;
+        errorY = tagY - target.robotPose.getPosition().y;
         errorAngle = target.ftcPose.bearing;
         PEX = errorX; PEY = errorY; PEBEARING = errorAngle;
     }
-
-    private boolean xInchRadius(AprilTagProcessor tagProcessor, int num) {
-        int xInches = num;
+    //xinch will reduce strain on driver so we dont mess up at stemtastic ig
+    //tune xinches to how much we want to slow down
+    public void xInchRadius(AprilTagProcessor tagProcessor, int xInches) {
         ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
-
-        for (int i = 0; i < detections.size(); i++) {
-            AprilTagDetection tag = detections.get(i);
-            if (tag.id == 1 || tag.id == 2 || tag.id == 3) {
-                double x = tag.ftcPose.x;
-                double y = tag.ftcPose.y;
-                double distance = Math.sqrt((x * x) + (y * y));
-                if (distance <= xInches) {
-                    return true;
-                }
+        for (AprilTagDetection tag: detections) {
+            double x = tag.ftcPose.x;
+            double y = tag.ftcPose.y;
+            double distance = Math.sqrt((x * x) + (y * y));
+            if (distance <= xInches) {
+                speed += 0.4;
             }
         }
-        return false;
     }
 }
