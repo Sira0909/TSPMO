@@ -165,7 +165,7 @@ public class BasicTeleopForTSPMO_Red extends LinearOpMode {
         if (gamepad1.circle) { // Note: this will only move towards board while circle is held
             ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
             AprilTagDetection target = null;
-            if (!detections.isEmpty()) {
+            if (!detections.isEmpty() && opModeIsActive()) {
                 for (AprilTagDetection tag : detections) {
                     telemetry.addLine(String.format("XYZ %6.2f %6.2f %6.2f", tag.ftcPose.x, tag.ftcPose.y, tag.ftcPose.z));
                     if (tag.id == 1 || tag.id == 2 || tag.id == 3) { // Blue alliance tags
