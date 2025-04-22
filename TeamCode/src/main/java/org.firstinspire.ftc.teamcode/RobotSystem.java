@@ -1,9 +1,9 @@
 package org.firstinspire.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import teamcode.subsystems.DriveSubsystem;
-import teamcode.subsystems.LowClawSubsystem;
-import teamcode.subsystems.indepSubsystem;
+import org.firstinspire.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspire.ftc.teamcode.subsystems.LowClawSubsystem;
+import org.firstinspire.ftc.teamcode.subsystems.indepSubsystem;
 
 public class RobotSystem {
 

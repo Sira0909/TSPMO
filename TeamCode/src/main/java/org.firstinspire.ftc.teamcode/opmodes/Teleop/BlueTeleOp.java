@@ -44,8 +44,7 @@ public class BlueTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         this.robot = new RobotSystem(hardwareMap, this);
-        robot.inDep.closeClaw();
-        robot.inDep.setElbowPos(0);
+        // add reset servos? idk why ts is still broken
 
 
 
