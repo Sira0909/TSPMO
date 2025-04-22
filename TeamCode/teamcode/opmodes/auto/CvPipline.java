@@ -14,7 +14,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class CvPipline extends OpenCvPipeline implements VisionProcessor {
+public class CvPipline extends OpenCvPipeline{
 
     private Rect leftSide;
     private Rect middle;
@@ -44,7 +44,7 @@ public class CvPipline extends OpenCvPipeline implements VisionProcessor {
     }
 
     @Override
-    public void init(int width, int height, CameraCalibration calibration) {
+    public Mat processFrame(Mat frame) {
         if (isRed) {
             upperUpper = new Scalar(180, 50, 50);
             upperLower = new Scalar(170, 50, 50);
@@ -57,31 +57,23 @@ public class CvPipline extends OpenCvPipeline implements VisionProcessor {
             lowerLower = new Scalar(110, 50, 50);
         }
 
+        int width  = 0;
+        int height = 0;
+
+        //change based on camera placement
         leftSide = new Rect(new Point(0, 0), new Point(0.33 * width, height));
         middle = new Rect(new Point(0.33 * width, 0), new Point(0.66 * width, height));
         rightSide = new Rect(new Point(0.66 * width, 0), new Point(width, height));
-    }
 
-    @Override
-    public Object processFrame(Mat frame, long captureTimeNanos) {
-        return null;
-    }
-
-
-    @Override
-    public Mat processFrame(Mat frame) {
-        // Convert to HSV color space
-        Imgproc.cvtColor(frame, HSV, Imgproc.COLOR_BGR2HSV);
+        Imgproc.cvtColor(frame, HSV, Imgproc.COLOR_RGB2HSV);
         Core.inRange(HSV, upperLower, upperUpper, high);
         Core.inRange(HSV, lowerLower, lowerUpper, low);
         Core.bitwise_or(low, high, range);
 
-        // Calculate percentages for each region
         percentLeft = (Core.sumElems(range.submat(leftSide)).val[0] / leftSide.area()) * 100;
         percentRight = (Core.sumElems(range.submat(rightSide)).val[0] / rightSide.area()) * 100;
         percentMiddle = (Core.sumElems(range.submat(middle)).val[0] / middle.area()) * 100;
 
-        // Determine the prediction based on max detection
         if (percentLeft > percentMiddle && percentLeft > percentRight && percentLeft > min) {
             prediction = PropDetect.LEFT;
         } else if (percentMiddle > percentLeft && percentMiddle > percentRight && percentMiddle > min) {
@@ -95,7 +87,7 @@ public class CvPipline extends OpenCvPipeline implements VisionProcessor {
             }
         }
 
-        // Draw rectangles based on prediction
+        //ecov sim
         if (prediction == PropDetect.LEFT) {
             Imgproc.rectangle(frame, leftSide, lowerUpper);
         } else if (prediction == PropDetect.MIDDLE) {
@@ -112,15 +104,13 @@ public class CvPipline extends OpenCvPipeline implements VisionProcessor {
         // Not implemented
     }
 
-    public PropDetect getPrediction() {
-        return prediction;
-    }
+    public PropDetect getPrediction() {return prediction;}
 
     public enum PropDetect {
         LEFT(1),
         MIDDLE(2),
         RIGHT(3),
-        ERROR(0);
+        ERROR(-1);
 
         public final int posNum;
 

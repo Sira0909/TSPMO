@@ -1,10 +1,10 @@
-package teamcode.opmodes.Teleop;
+package org.firstinspires.ftc.teamcode.opmodes.Teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import teamcode.opmodes.auto.CvPipline;
+import org.firstinspires.ftc.teamcode.opmodes.auto.CvPipline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;

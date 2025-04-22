@@ -21,7 +21,7 @@ public class HardwareRobot {
 
     public final GoBildaPinpointDriver pinpoint;
 
-    public final Limelight3A limelight;
+
     public final WebcamName cameraName;
     public final MotorEx leftLift; //confirm motor type
     public final MotorEx rightLift; //same as previous
@@ -100,7 +100,6 @@ public class HardwareRobot {
         ////////////
         // CAMERA //
         ////////////
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
         cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
     }
