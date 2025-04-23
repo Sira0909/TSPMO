@@ -8,7 +8,7 @@ import org.firstinspire.ftc.teamcode.RobotConstants;
 //down + up rotation are different from picking up pos and depositing pos.
 // x is toggle claw, triangle is middle rotation, square is down rotation, circle is up rotation. left bumper is macro 1 and right bumper is macro 2
 //TODO: add macro w error for going down and opening claw, macro for picking up and raising, macro for raising even more. claw should be opened separately.
-@TeleOp
+@TeleOp (name = "StemtasticTeleOp")
 public class StemtasticTeleOp extends LinearOpMode {
     public RobotSystem robot;
     public double speed;
@@ -45,7 +45,9 @@ public class StemtasticTeleOp extends LinearOpMode {
             telemetry.addData("Strafe: ", strafe);
             telemetry.addData("Turn: ", turn);
             telemetry.addData("Forward: ", forward);
-            telemetry.addData("Elbow Power: ", elbowPower);
+            telemetry.addData("Elbow Position: ", elbowPower);
+            telemetry.addData("Rotation Position: ", rotationPos);
+            telemetry.addData("Claw Position: ", clawPos);
             telemetry.update();
             // the following work as toggle - we wouldnt even need to use them unless were showing the movement to ppl
             // this is because otherwise we would just use the macros
