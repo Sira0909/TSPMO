@@ -16,6 +16,44 @@ public class StemtasticTeleOp extends LinearOpMode {
     public double clawPos;
     public boolean toggleClaw = false;
     public boolean claw = true;
+
+    // the following work as toggle - we wouldnt even need to use them unless were showing the movement to ppl
+    // this is because otherwise we would just use the macros
+    public double rotation(){
+        if (gamepad1.square) {
+            rotationPos = RobotConstants.CLAWROTATIONUP;
+        }
+        else {
+            rotationPos = RobotConstants.CLAWROTATIONMIDDLE;
+        }
+        if (gamepad1.circle) {
+            rotationPos = RobotConstants.CLAWROTATIONDOWN;
+        }
+        else {
+            rotationPos = RobotConstants.CLAWROTATIONMIDDLE;
+        }
+        return rotationPos;
+    }
+
+    public double elbow(double elbowpower){
+        robot.inDep.setElbowPos(elbowpower);
+        if (gamepad1.dpad_right && !toggleClaw) {
+            claw = !claw;
+            toggleClaw = true;
+        }
+        if (!gamepad1.dpad_right) {
+            toggleClaw = false;
+            claw = true;
+        }
+        if (claw) {
+            clawPos = RobotConstants.CLOSECLAW;
+        }
+        else {
+            clawPos = RobotConstants.OPENCLAW;
+        }
+        return clawPos;
+    }
+
     @Override
     public void runOpMode () throws InterruptedException {
         this.robot = new RobotSystem(hardwareMap, this);
@@ -49,37 +87,13 @@ public class StemtasticTeleOp extends LinearOpMode {
             telemetry.addData("Rotation Position: ", rotationPos);
             telemetry.addData("Claw Position: ", clawPos);
             telemetry.update();
-            // the following work as toggle - we wouldnt even need to use them unless were showing the movement to ppl
-            // this is because otherwise we would just use the macros
-            if (gamepad1.square) {
-                rotationPos = RobotConstants.CLAWROTATIONUP;
-            }
-            else {
-                rotationPos = RobotConstants.CLAWROTATIONMIDDLE;
-            }
-            if (gamepad1.circle) {
-                rotationPos = RobotConstants.CLAWROTATIONDOWN;
-            }
-            else {
-                rotationPos = RobotConstants.CLAWROTATIONMIDDLE;
-            }
+
+            rotation();
+
             //now for claw pressing once - we need to use it in action.
             double elbowpower = gamepad1.right_stick_y;
-            robot.inDep.setElbowPos(elbowpower);
-            if (gamepad1.dpad_right && !toggleClaw) {
-                claw = !claw;
-                toggleClaw = true;
-            }
-            if (!gamepad1.dpad_right) {
-                toggleClaw = false;
-                claw = true;
-            }
-            if (claw) {
-                clawPos = RobotConstants.CLOSECLAW;
-            }
-            else {
-                clawPos = RobotConstants.OPENCLAW;
-            }
+
+            elbow(elbowpower);
         }
     }
 }
