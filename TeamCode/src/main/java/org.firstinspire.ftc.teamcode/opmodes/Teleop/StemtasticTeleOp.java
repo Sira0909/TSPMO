@@ -19,7 +19,7 @@ public class StemtasticTeleOp extends LinearOpMode {
 
     // the following work as toggle - we wouldnt even need to use them unless were showing the movement to ppl
     // this is because otherwise we would just use the macros
-    public double rotation(){
+    public void rotation(){
         if (gamepad1.square) {
             rotationPos = RobotConstants.CLAWROTATIONUP;
         }
@@ -32,10 +32,9 @@ public class StemtasticTeleOp extends LinearOpMode {
         else {
             rotationPos = RobotConstants.CLAWROTATIONMIDDLE;
         }
-        return rotationPos;
     }
 
-    public double elbow(double elbowpower){
+    public void elbow(double elbowpower){
         robot.inDep.setElbowPos(elbowpower);
         if (gamepad1.dpad_right && !toggleClaw) {
             claw = !claw;
@@ -51,18 +50,18 @@ public class StemtasticTeleOp extends LinearOpMode {
         else {
             clawPos = RobotConstants.OPENCLAW;
         }
-        return clawPos;
     }
 
     @Override
     public void runOpMode () throws InterruptedException {
         this.robot = new RobotSystem(hardwareMap, this);
-        robot.inDep.setElbowPos(0);
+        //this will be fixed once i have the arm
+        robot.inDep.setElbowPos(RobotConstants.ELBOWMIDDLE);
         speed = 0.6;
-        robot.inDep.setClawPosition(0);
-        robot.inDep.setRotationPos(RobotConstants.CLAWROTATIONMIDDLE);
-        rotationPos = 0.6;
-        clawPos = 0;
+        clawPos = RobotConstants.CLOSECLAW;
+        robot.inDep.setClawPosition(clawPos);
+        rotationPos = RobotConstants.CLAWROTATIONMIDDLE;
+        robot.inDep.setRotationPos(rotationPos);
         waitForStart();
         while(opModeIsActive()) {
             robot.inDep.setClawPosition(clawPos);
@@ -92,7 +91,6 @@ public class StemtasticTeleOp extends LinearOpMode {
 
             //now for claw pressing once - we need to use it in action.
             double elbowpower = gamepad1.right_stick_y;
-
             elbow(elbowpower);
         }
     }
