@@ -9,7 +9,7 @@ public class RobotConstants {
     public static double CLAWROTATIONBACKBOARD = 0.35;
     public static double CLAWROTATIONMIDDLE = 0.32;
     public static double CLAWROTATIONPICKINGUP = 0.37;
-    //ts is useless since we wont have lift
-    public static int ELBOWCONST;
-    //if we decide not to use the trigger to control the elbow, more constants for positions here.
+    public static double ELBOWMIDDLE;
+    public static double ELBOWDOWN;
+    public static double ELBOWUP;
 }
