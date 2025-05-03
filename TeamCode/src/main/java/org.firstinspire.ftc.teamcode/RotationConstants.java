@@ -1,13 +1,11 @@
-package org.firstinspire.ftc.teamcode.synchropather.systems.rotation;
+package org.firstinspire.ftc.teamcode;
 
-import com.acmerobotics.dashboard.config.Config;
 
-import org.firstinspire.ftc.teamcode.synchropather.DriveConstants;
+import org.firstinspire.ftc.teamcode.DriveConstants;
 
 /**
  * A static class used by Rotation Movements to reference important kinematic and algorithmic tuning values.
  */
-@Config
 public class RotationConstants {
 
     /**

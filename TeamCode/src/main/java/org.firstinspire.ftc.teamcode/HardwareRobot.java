@@ -21,10 +21,8 @@ public class HardwareRobot {
 
 
 
-    public final WebcamName cameraName;
-
     public final Servo claw;
-    public final Servo elbow;
+    public final MotorEx elbow;
     public final Servo clawrotation;
 
     public HardwareRobot(HardwareMap hardwareMap) {
@@ -67,16 +65,20 @@ public class HardwareRobot {
         leftBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
+        elbow = new MotorEx(hardwareMap, "Elbow", Motor.GoBILDA.RPM_312);
+        elbow.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elbow.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        elbow.setRunMode(Motor.RunMode.RawPower);
+        elbow.setInverted(true);
+        elbow.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         /////////////
         // SERVOS  //
         /////////////
         claw = hardwareMap.get(ServoImplEx.class, "Claw");
-        elbow = hardwareMap.get(ServoImplEx.class, "Elbow");
-        clawrotation = hardwareMap.get(ServoImplEx.class, "Claw Rotation");
+        clawrotation = hardwareMap.get(ServoImplEx.class, "Rotation");
         ////////////
         // CAMERA //
         ////////////
-        cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
     }
 }
