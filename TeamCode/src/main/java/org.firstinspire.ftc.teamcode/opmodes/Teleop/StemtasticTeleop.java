@@ -1,6 +1,8 @@
 package org.firstinspire.ftc.teamcode.opmodes.Teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspire.ftc.teamcode.RobotSystem;
 import org.firstinspire.ftc.teamcode.RobotConstants;
 //TODO: FIX DRIVE MOTORS AND WRITE DRIVE CODE AND TEST ARM STABILITY, WRITE PIKUP + BAKDROP MAROS
@@ -17,7 +19,7 @@ public class StemtasticTeleop extends LinearOpMode {
     private boolean wassqpressedlastloop = false;
     public double elbowpp;
     public double elbowp;
-    public double speed;
+    public double speed = 0.5;
 
     @Override
     public void runOpMode () throws InterruptedException {
@@ -29,10 +31,10 @@ public class StemtasticTeleop extends LinearOpMode {
         robot.inDep.setRotationPosition(rotationPos);
         waitForStart();
         while(opModeIsActive()) {
-            double strafe = gamepad1.left_stick_x;
-            double turn = gamepad1.right_stick_x;
+            double strafe = -gamepad1.left_stick_x;
+            double turn = -gamepad1.right_stick_x;
             double forward = -gamepad1.left_stick_y;
-            robot.drive.driveRobotCentric(strafe, forward, turn);
+            robot.drive.driveRobotCentricPowers(strafe * speed, forward * speed, turn * speed);
             boolean isPressed = gamepad1.dpad_right;
             if (isPressed && !wasXPressedLastLoop) {
                 clawOpen = !clawOpen;
@@ -73,6 +75,22 @@ public class StemtasticTeleop extends LinearOpMode {
             telemetry.update();
             wasXPressedLastLoop = isPressed;
             wassqpressedlastloop = ispressed;
+        }
+    }
+    public void PDController(double target, double current) {
+        double error = target - current;
+        double kP = 0.01;
+        double kD = 0.001;
+        double lastError = error;
+        ElapsedTime runtime = new ElapsedTime(0);
+        while (opModeIsActive()) {
+            error = target - current;
+            double deltaTime = runtime.seconds();
+            double derivative = (error - lastError) / deltaTime;
+            double u_t = kP * error + kD * derivative;
+            elbowp = u_t;
+            lastError = error;
+            runtime.reset();
         }
     }
 }
