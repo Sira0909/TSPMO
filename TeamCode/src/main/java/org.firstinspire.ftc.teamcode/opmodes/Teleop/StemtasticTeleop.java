@@ -62,6 +62,7 @@ public class StemtasticTeleop extends LinearOpMode {
             encoderposs = robot.inDep.getEncoder(encoderposs);
             robot.inDep.setElbowPosition(elbowpp);
             robot.inDep.setClawPosition(clawPos);
+            robot.inDep.setRotationPosition(rotationPos);
             telemetry.addData("Rotation Position: ", rotationPos);
             telemetry.addData("Claw Position: ", clawPos);
             telemetry.addData("Elbow: ", elbowp);
