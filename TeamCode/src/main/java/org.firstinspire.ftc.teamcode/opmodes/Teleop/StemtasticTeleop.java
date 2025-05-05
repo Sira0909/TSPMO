@@ -20,15 +20,19 @@ public class StemtasticTeleop extends LinearOpMode {
     public double elbowpp;
     public double elbowp;
     public double speed = 0.5;
+    public boolean toggleMacroOne = false;
+    public boolean MacroOne = false;
 
     @Override
     public void runOpMode () throws InterruptedException {
         this.robot = new RobotSystem(hardwareMap, this);
+        double lastError = 9999999;
         //this will be fixed once i have the arm
         clawPos = RobotConstants.CLOSECLAW;
         robot.inDep.setClawPosition(clawPos);
         rotationPos = RobotConstants.CLAWROTATIONBACKBOARD;
         robot.inDep.setRotationPosition(rotationPos);
+        ElapsedTime runtime = new ElapsedTime(0);
         waitForStart();
         while(opModeIsActive()) {
             double strafe = -gamepad1.left_stick_x;
@@ -61,6 +65,29 @@ public class StemtasticTeleop extends LinearOpMode {
             if (elbowp < 0) {
                 elbowpp = elbowp * 0.1;
             }
+            if (gamepad1.triangle && !toggleMacroOne) {
+                MacroOne = true;
+            }
+            toggleMacroOne = gamepad1.triangle;
+            if (MacroOne) {
+                double target = -659;
+                double error = target - encoderposs;
+                double kP = 0.01;
+                double kD = 0.001;
+                error = target - encoderposs;
+                double deltaTime = runtime.seconds();
+                double derivative = (error - lastError) / deltaTime;
+                if (lastError == 9999999) {
+                     derivative = 0;
+                }
+                double u_t = kP * error + kD * derivative;
+                elbowp = u_t;
+                lastError = error;
+                runtime.reset();
+                if (error <= 10) {
+                    MacroOne = false;
+                }
+            }
             encoderposs = robot.inDep.getEncoder(encoderposs);
             robot.inDep.setElbowPosition(elbowpp);
             robot.inDep.setClawPosition(clawPos);
@@ -75,22 +102,7 @@ public class StemtasticTeleop extends LinearOpMode {
             telemetry.update();
             wasXPressedLastLoop = isPressed;
             wassqpressedlastloop = ispressed;
-        }
-    }
-    public void PDController(double target, double current) {
-        double error = target - current;
-        double kP = 0.01;
-        double kD = 0.001;
-        double lastError = error;
-        ElapsedTime runtime = new ElapsedTime(0);
-        while (opModeIsActive()) {
-            error = target - current;
-            double deltaTime = runtime.seconds();
-            double derivative = (error - lastError) / deltaTime;
-            double u_t = kP * error + kD * derivative;
-            elbowp = u_t;
-            lastError = error;
-            runtime.reset();
+
         }
     }
 }
