@@ -65,6 +65,7 @@ public class HardwareRobot {
         leftBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
+        //check rpm for elbow
         elbow = new MotorEx(hardwareMap, "Elbow", Motor.GoBILDA.RPM_312);
         elbow.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elbow.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -76,9 +77,5 @@ public class HardwareRobot {
         /////////////
         claw = hardwareMap.get(ServoImplEx.class, "Claw");
         clawrotation = hardwareMap.get(ServoImplEx.class, "Rotation");
-        ////////////
-        // CAMERA //
-        ////////////
-
     }
 }
