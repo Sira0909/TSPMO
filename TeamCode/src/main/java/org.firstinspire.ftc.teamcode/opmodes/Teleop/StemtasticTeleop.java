@@ -19,7 +19,7 @@ public class StemtasticTeleop extends LinearOpMode {
     private boolean wassqpressedlastloop = false;
     public double elbowpp;
     public double elbowp;
-    public double speed = 0.5;
+    public double speed = 0.4;
     public boolean toggleMacro = false;
     public boolean MacroRunning = false;
     public double target;
@@ -27,13 +27,14 @@ public class StemtasticTeleop extends LinearOpMode {
     @Override
     public void runOpMode () throws InterruptedException {
         this.robot = new RobotSystem(hardwareMap, this);
+        double lastError = 9999999;
         clawPos = RobotConstants.CLOSECLAW;
         robot.inDep.setClawPosition(clawPos);
         rotationPos = RobotConstants.CLAWROTATIONBACKBOARD;
         robot.inDep.setRotationPosition(rotationPos);
+        ElapsedTime runtime = new ElapsedTime(0);
         waitForStart();
         while(opModeIsActive()) {
-            double error = target - encoderposs;
             double strafe = -gamepad1.left_stick_x;
             double turn = -gamepad1.right_stick_x;
             double forward = -gamepad1.left_stick_y;
@@ -64,20 +65,6 @@ public class StemtasticTeleop extends LinearOpMode {
             if (elbowp < 0) {
                 elbowpp = elbowp * 0.1;
             }
-            if (gamepad1.triangle && !toggleMacro) {
-                MacroRunning = true;
-            }
-            toggleMacro = gamepad1.triangle;
-            if (MacroRunning) {
-                target = -659;
-                error = target - encoderposs;
-                if (Math.abs(error) >= 10) {
-                    robot.inDep.setElbowPosition(0.2);
-                }
-                else {
-                    MacroRunning = false;
-                }
-            }
             encoderposs = robot.inDep.getEncoder(encoderposs);
             robot.inDep.setElbowPosition(elbowpp);
             robot.inDep.setClawPosition(clawPos);
@@ -92,6 +79,7 @@ public class StemtasticTeleop extends LinearOpMode {
             telemetry.update();
             wasXPressedLastLoop = isPressed;
             wassqpressedlastloop = ispressed;
+
         }
     }
 }
