@@ -1,11 +1,20 @@
 package org.firstinspire.ftc.teamcode.opmodes.Teleop;
+
+import android.util.Size;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspire.ftc.teamcode.RobotSystem;
 import org.firstinspire.ftc.teamcode.RobotConstants;
-//TODO: FIX DRIVE MOTORS AND WRITE DRIVE CODE AND TEST ARM STABILITY, WRITE PIKUP + BAKDROP MAROS
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.VisionProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import java.util.ArrayList;
+
+//TODO: WRITE PIKUP + BAKDROP MAROS
 @TeleOp (name = "CorrectTeleop")
 public class StemtasticTeleop extends LinearOpMode {
     public RobotSystem robot;
@@ -21,18 +30,47 @@ public class StemtasticTeleop extends LinearOpMode {
     public double elbowp;
     public double speed = 0.4;
     public boolean toggleMacro = false;
-    public boolean MacroRunning = false;
-    public double target;
+    public boolean macroRunning = true;
+
+    public double lastError = 9999;
+
+    public AprilTagDetection lastDetectedTag;
+    AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
+            .setDrawAxes(true)
+            .setDrawTagID(true)
+            .setDrawTagOutline(true)
+            .setDrawCubeProjection(true)
+            .build();
+    VisionPortal visionPortal = new VisionPortal.Builder()
+            .addProcessor(tagProcessor)
+            .setCamera(hardwareMap.get(WebcamName.class, "Webcam"))
+            .setCameraResolution(new Size(400,400)) //obv replace
+            .setStreamFormat(VisionPortal.StreamFormat.YUY2)
+            .build();
+
+    public void detectTags() {
+        ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
+        if(detections != null) {
+            telemetry.addLine("AprilTag Detected.");
+            for(AprilTagDetection tag : detections) {
+                telemetry.addData("ID", tag.id);
+                telemetry.addData("X (Sideways offset)", tag.ftcPose.x);
+                telemetry.addData("Y (Forward/Back Offset", tag.ftcPose.y);
+                telemetry.addData("Z", tag.ftcPose.y);
+                telemetry.addData("Bearing", tag.ftcPose);
+                telemetry.addData("Yaw", tag.ftcPose.yaw);
+                lastDetectedTag = tag;
+            }
+        }
+    }
 
     @Override
     public void runOpMode () throws InterruptedException {
         this.robot = new RobotSystem(hardwareMap, this);
-        double lastError = 9999999;
         clawPos = RobotConstants.CLOSECLAW;
         robot.inDep.setClawPosition(clawPos);
         rotationPos = RobotConstants.CLAWROTATIONBACKBOARD;
         robot.inDep.setRotationPosition(rotationPos);
-        ElapsedTime runtime = new ElapsedTime(0);
         waitForStart();
         while(opModeIsActive()) {
             double strafe = -gamepad1.left_stick_x;
@@ -79,7 +117,6 @@ public class StemtasticTeleop extends LinearOpMode {
             telemetry.update();
             wasXPressedLastLoop = isPressed;
             wassqpressedlastloop = ispressed;
-
         }
     }
 }

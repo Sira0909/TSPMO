@@ -25,6 +25,8 @@ public class HardwareRobot {
     public final MotorEx elbow;
     public final Servo clawrotation;
 
+    public final WebcamName camera;
+
     public HardwareRobot(HardwareMap hardwareMap) {
 
         ////////////
@@ -77,5 +79,7 @@ public class HardwareRobot {
         /////////////
         claw = hardwareMap.get(ServoImplEx.class, "Claw");
         clawrotation = hardwareMap.get(ServoImplEx.class, "Rotation");
+
+        camera = hardwareMap.get(WebcamName.class, "Webcam 1");
     }
 }
