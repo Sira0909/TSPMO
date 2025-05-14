@@ -14,7 +14,9 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 
-//TODO: WRITE PIKUP + BAKDROP MAROS
+//TODO: WRITE PIKUP + BAKDROP MAROS + A LIMLIGHT VRSION FOR TTING APRILTAGS
+//TODO: MAK XINHRAIUS AN RIV TO TAG AN P ONTROLLR AN RIV TO SP PT
+
 @TeleOp (name = "CorrectTeleop")
 public class StemtasticTeleop extends LinearOpMode {
     public RobotSystem robot;
@@ -33,6 +35,11 @@ public class StemtasticTeleop extends LinearOpMode {
     public boolean macroRunning = true;
 
     public double lastError = 9999;
+    public AprilTagDetection tag1;
+    public AprilTagDetection tag2;
+    public AprilTagDetection tag3;
+    public AprilTagDetection tag4;
+    public WebcamName am = hardwareMap.get(WebcamName.class, "Wbam");
 
     public AprilTagDetection lastDetectedTag;
     AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
@@ -43,7 +50,7 @@ public class StemtasticTeleop extends LinearOpMode {
             .build();
     VisionPortal visionPortal = new VisionPortal.Builder()
             .addProcessor(tagProcessor)
-            .setCamera(hardwareMap.get(WebcamName.class, "Webcam"))
+            .setCamera(am)
             .setCameraResolution(new Size(400,400)) //obv replace
             .setStreamFormat(VisionPortal.StreamFormat.YUY2)
             .build();
@@ -54,6 +61,20 @@ public class StemtasticTeleop extends LinearOpMode {
             telemetry.addLine("AprilTag Detected.");
             for(AprilTagDetection tag : detections) {
                 telemetry.addData("ID", tag.id);
+                switch(tag.id) {
+                    case 1:
+                        tag1 = tag;
+                        break;
+                    case 2:
+                        tag2 = tag;
+                        break;
+                    case 3:
+                        tag3 = tag;
+                        break;
+                    case 4:
+                        tag4 = tag;
+                        break;
+                }
                 telemetry.addData("X (Sideways offset)", tag.ftcPose.x);
                 telemetry.addData("Y (Forward/Back Offset", tag.ftcPose.y);
                 telemetry.addData("Z", tag.ftcPose.y);
@@ -66,6 +87,10 @@ public class StemtasticTeleop extends LinearOpMode {
 
     @Override
     public void runOpMode () throws InterruptedException {
+        visionPortal.setActiveCamera(am);
+        visionPortal.resumeStreaming();
+        visionPortal.resumeLiveView();
+        visionPortal.setProcessorEnabled(tagProcessor,true);
         this.robot = new RobotSystem(hardwareMap, this);
         clawPos = RobotConstants.CLOSECLAW;
         robot.inDep.setClawPosition(clawPos);
@@ -117,6 +142,7 @@ public class StemtasticTeleop extends LinearOpMode {
             telemetry.update();
             wasXPressedLastLoop = isPressed;
             wassqpressedlastloop = ispressed;
+
         }
     }
 }
