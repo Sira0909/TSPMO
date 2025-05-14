@@ -53,6 +53,8 @@ public class StemtasticTeleop extends LinearOpMode {
             .setCamera(am)
             .setCameraResolution(new Size(400,400)) //obv replace
             .setStreamFormat(VisionPortal.StreamFormat.YUY2)
+            .enableLiveView(true)
+            .setAutoStopLiveView(true)
             .build();
 
     public void detectTags() {
@@ -88,8 +90,6 @@ public class StemtasticTeleop extends LinearOpMode {
     @Override
     public void runOpMode () throws InterruptedException {
         visionPortal.setActiveCamera(am);
-        visionPortal.resumeStreaming();
-        visionPortal.resumeLiveView();
         visionPortal.setProcessorEnabled(tagProcessor,true);
         this.robot = new RobotSystem(hardwareMap, this);
         clawPos = RobotConstants.CLOSECLAW;
@@ -142,7 +142,7 @@ public class StemtasticTeleop extends LinearOpMode {
             telemetry.update();
             wasXPressedLastLoop = isPressed;
             wassqpressedlastloop = ispressed;
-
+            detectTags();
         }
     }
 }
