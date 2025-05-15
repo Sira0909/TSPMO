@@ -14,15 +14,21 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 
-//TODO: WRITE PIKUP + BAKDROP MAROS + A LIMLIGHT VRSION FOR TTING APRILTAGS
+//TODO: WRITE pickup + backdrop MAROS + A LIMLIGHT VRSION FOR TTING APRILTAGS
 //TODO: MAK XINHRAIUS AN RIV TO TAG AN P ONTROLLR AN RIV TO SP PT
-
+//holy shit this keyboard finally works les goooo
 @TeleOp (name = "CorrectTeleop")
 public class StemtasticTeleop extends LinearOpMode {
     public RobotSystem robot;
+    public ElapsedTime runtime = new ElapsedTime();
+
+    public void reset(ElapsedTime resetter) {
+        resetter.reset();
+    }
     public double rotationPos;
     public double clawPos;
     public int encoderposs;
+    public double lastError = 999;
 
     private boolean clawOpen = true;
     private boolean wasXPressedLastLoop = false;
@@ -31,15 +37,14 @@ public class StemtasticTeleop extends LinearOpMode {
     public double elbowpp;
     public double elbowp;
     public double speed = 0.4;
-    public boolean toggleMacro = false;
-    public boolean macroRunning = true;
-
-    public double lastError = 9999;
+    public boolean toggleMacroTag = false;
+    public boolean macroTagRunning = true;
     public AprilTagDetection tag1;
     public AprilTagDetection tag2;
     public AprilTagDetection tag3;
     public AprilTagDetection tag4;
     public WebcamName am = hardwareMap.get(WebcamName.class, "Wbam");
+    public int poweroption = 0;
 
     public AprilTagDetection lastDetectedTag;
     AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
@@ -54,7 +59,6 @@ public class StemtasticTeleop extends LinearOpMode {
             .setCameraResolution(new Size(400,400)) //obv replace
             .setStreamFormat(VisionPortal.StreamFormat.YUY2)
             .enableLiveView(true)
-            .setAutoStopLiveView(true)
             .build();
 
     public void detectTags() {
@@ -86,18 +90,45 @@ public class StemtasticTeleop extends LinearOpMode {
             }
         }
     }
-
+    public void driveToTag(AprilTagDetection tagg) {
+        double errorX = tagg.ftcPose.x;
+        double errorY = tagg.ftcPose.y;
+        double erroryaw = tagg.ftcPose.yaw;
+        PD(errorX, 0);
+        PD(errorY,1);
+        PD(erroryaw,2);
+    }
+    public void PD (double error, double option) {
+        double kP = 0.02;
+        double kD = 0.002;
+        lastError = error;
+        reset(runtime);
+        double deltaTime = runtime.seconds();
+        double derivative = (error - lastError) / deltaTime;
+        double power = kP * error + kD * derivative;
+        if (option == 0) {
+            robot.drive.driveRobotCentricPowers(power, 0,0);
+        }
+        else if (option == 1) {
+            robot.drive.driveRobotCentricPowers(0,power, 0);
+        }
+        else if (option == 2) {
+            robot.drive.driveRobotCentricPowers(0,0,power);
+        }
+    }
     @Override
     public void runOpMode () throws InterruptedException {
         visionPortal.setActiveCamera(am);
-        visionPortal.setProcessorEnabled(tagProcessor,true);
+        visionPortal.setProcessorEnabled(tagProcessor, true);
         this.robot = new RobotSystem(hardwareMap, this);
         clawPos = RobotConstants.CLOSECLAW;
         robot.inDep.setClawPosition(clawPos);
         rotationPos = RobotConstants.CLAWROTATIONBACKBOARD;
         robot.inDep.setRotationPosition(rotationPos);
         waitForStart();
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
+            double time = runtime.time();
+            telemetry.addData("Time: ", time);
             double strafe = -gamepad1.left_stick_x;
             double turn = -gamepad1.right_stick_x;
             double forward = -gamepad1.left_stick_y;
@@ -116,8 +147,7 @@ public class StemtasticTeleop extends LinearOpMode {
                 rotdown = !rotdown;
                 if (rotdown) {
                     rotationPos = RobotConstants.CLAWROTATIONPIKINGUP;
-                }
-                else {
+                } else {
                     rotationPos = RobotConstants.CLAWROTATIONBACKBOARD;
                 }
             }
