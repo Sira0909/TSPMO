@@ -47,6 +47,7 @@ public class StemtasticTeleop extends LinearOpMode {
     public int poweroption = 0;
 
     public AprilTagDetection lastDetectedTag;
+    public boolean drivecompleted = false;
     AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
             .setDrawAxes(true)
             .setDrawTagID(true)
@@ -102,18 +103,32 @@ public class StemtasticTeleop extends LinearOpMode {
         double kP = 0.02;
         double kD = 0.002;
         lastError = error;
-        reset(runtime);
         double deltaTime = runtime.seconds();
         double derivative = (error - lastError) / deltaTime;
         double power = kP * error + kD * derivative;
         if (option == 0) {
             robot.drive.driveRobotCentricPowers(power, 0,0);
+            if (Math.abs(error) <= 20) {
+                drivecompleted = true;
+                error = 0;
+                derivative = 0;
+            }
         }
         else if (option == 1) {
             robot.drive.driveRobotCentricPowers(0,power, 0);
+            if (Math.abs(error) <= 20) {
+                drivecompleted = true;
+                error = 0;
+                derivative = 0;
+            }
         }
         else if (option == 2) {
             robot.drive.driveRobotCentricPowers(0,0,power);
+            if (Math.abs(error) <= 20) {
+                drivecompleted = true;
+                error = 0;
+                derivative = 0;
+            }
         }
     }
     @Override
@@ -157,6 +172,17 @@ public class StemtasticTeleop extends LinearOpMode {
             }
             if (elbowp < 0) {
                 elbowpp = elbowp * 0.1;
+            }
+            if (gamepad1.circle && !toggleMacroTag) {
+                macroTagRunning = true;
+            }
+            if (macroTagRunning) {
+                driveToTag(lastDetectedTag);
+                toggleMacroTag = true;
+                if (drivecompleted) {
+                    toggleMacroTag = false;
+                    macroTagRunning = false;
+                }
             }
             encoderposs = robot.inDep.getEncoder(encoderposs);
             robot.inDep.setElbowPosition(elbowpp);
