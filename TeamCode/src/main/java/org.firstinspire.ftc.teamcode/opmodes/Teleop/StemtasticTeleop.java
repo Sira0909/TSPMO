@@ -15,10 +15,10 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 
-//TODO: WRITE pickup + backdrop MAROS + A LIMLIGHT VRSION FOR TTING APRILTAGS
-//TODO: MAK XINHRAIUS AN RIV TO TAG AN P ONTROLLR AN RIV TO SP PT
-//holy shit this keyboard finally works les goooo
-@TeleOp (name = "CorrectTeleop")
+//TODO: write arm up and down macros
+//TODO: code possible auto and design coord system
+//TODO: make xinchradius method
+@TeleOp (name = "StemtasticTeleOp")
 public class StemtasticTeleop extends LinearOpMode {
     public RobotSystem robot;
     public ElapsedTime runtime = new ElapsedTime();
@@ -32,13 +32,9 @@ public class StemtasticTeleop extends LinearOpMode {
     public double elbowpp;
     public double lastError = 0;
     public double elbowp;
+    public double lastTime = 0;
     public double speed = 0.4;
-    public boolean toggleMacroTag = false;
     public boolean macroTagRunning = true;
-    public AprilTagDetection tag1;
-    public AprilTagDetection tag2;
-    public AprilTagDetection tag3;
-    public AprilTagDetection tag4;
     public WebcamName am = hardwareMap.get(WebcamName.class, "Wbam");
 
     public AprilTagDetection lastDetectedTag;
@@ -63,20 +59,6 @@ public class StemtasticTeleop extends LinearOpMode {
             telemetry.addLine("AprilTag Detected.");
             for(AprilTagDetection tag : detections) {
                 telemetry.addData("ID", tag.id);
-                switch(tag.id) {
-                    case 1:
-                        tag1 = tag;
-                        break;
-                    case 2:
-                        tag2 = tag;
-                        break;
-                    case 3:
-                        tag3 = tag;
-                        break;
-                    case 4:
-                        tag4 = tag;
-                        break;
-                }
                 telemetry.addData("X (Sideways offset)", tag.ftcPose.x);
                 telemetry.addData("Y (Forward/Back Offset", tag.ftcPose.y);
                 telemetry.addData("Z", tag.ftcPose.y);
@@ -96,17 +78,16 @@ public class StemtasticTeleop extends LinearOpMode {
         PD(erroryaw,2);
     }
     public void PD (double error, double option) {
+        double time = runtime.seconds();
         double kP = 0.02;
         double kD = 0.002;
-        double deltaTime = runtime.seconds();
+        double deltaTime = time - lastTime;
         double derivative = (error - lastError) / deltaTime;
         double power = kP * error + kD * derivative;
         if (option == 0) {
             robot.drive.driveRobotCentricPowers(power, 0,0);
             if (Math.abs(error) <= 10) {
                 drivecompleted = true;
-                error = 0;
-                derivative = 0;
             }
         }
         else if (option == 1) {
@@ -128,6 +109,11 @@ public class StemtasticTeleop extends LinearOpMode {
             //arm down macro here
         }
         lastError = error;
+        lastTime = time;
+    }
+    //ts method
+    public void xInchRadius() {
+
     }
     @Override
     public void runOpMode () throws InterruptedException {
@@ -179,7 +165,9 @@ public class StemtasticTeleop extends LinearOpMode {
                 if (drivecompleted) {
                     macroTagRunning = false;
                 }
-                driveToTag(lastDetectedTag); //change ts
+                else {
+                    driveToTag(lastDetectedTag); //change ts
+                }
             }
             encoderposs = robot.inDep.getEncoder(encoderposs);
             robot.inDep.setElbowPosition(elbowpp);
