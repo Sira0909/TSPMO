@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 
@@ -21,20 +22,15 @@ import java.util.ArrayList;
 public class StemtasticTeleop extends LinearOpMode {
     public RobotSystem robot;
     public ElapsedTime runtime = new ElapsedTime();
-
-    public void reset(ElapsedTime resetter) {
-        resetter.reset();
-    }
     public double rotationPos;
     public double clawPos;
     public int encoderposs;
-    public double lastError = 999;
-
     private boolean clawOpen = true;
     private boolean wasXPressedLastLoop = false;
     private boolean rotdown = true;
     private boolean wassqpressedlastloop = false;
     public double elbowpp;
+    public double lastError = 0;
     public double elbowp;
     public double speed = 0.4;
     public boolean toggleMacroTag = false;
@@ -44,7 +40,6 @@ public class StemtasticTeleop extends LinearOpMode {
     public AprilTagDetection tag3;
     public AprilTagDetection tag4;
     public WebcamName am = hardwareMap.get(WebcamName.class, "Wbam");
-    public int poweroption = 0;
 
     public AprilTagDetection lastDetectedTag;
     public boolean drivecompleted = false;
@@ -60,8 +55,8 @@ public class StemtasticTeleop extends LinearOpMode {
             .setCameraResolution(new Size(400,400)) //obv replace
             .setStreamFormat(VisionPortal.StreamFormat.YUY2)
             .enableLiveView(true)
+            .setAutoStopLiveView(true)
             .build();
-
     public void detectTags() {
         ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
         if(detections != null) {
@@ -92,8 +87,9 @@ public class StemtasticTeleop extends LinearOpMode {
         }
     }
     public void driveToTag(AprilTagDetection tagg) {
-        double errorX = tagg.ftcPose.x;
-        double errorY = tagg.ftcPose.y;
+        drivecompleted = false;
+        double errorX =  tagg.ftcPose.x;
+        double errorY =  tagg.ftcPose.y;
         double erroryaw = tagg.ftcPose.yaw;
         PD(errorX, 0);
         PD(errorY,1);
@@ -102,13 +98,12 @@ public class StemtasticTeleop extends LinearOpMode {
     public void PD (double error, double option) {
         double kP = 0.02;
         double kD = 0.002;
-        lastError = error;
         double deltaTime = runtime.seconds();
         double derivative = (error - lastError) / deltaTime;
         double power = kP * error + kD * derivative;
         if (option == 0) {
             robot.drive.driveRobotCentricPowers(power, 0,0);
-            if (Math.abs(error) <= 20) {
+            if (Math.abs(error) <= 10) {
                 drivecompleted = true;
                 error = 0;
                 derivative = 0;
@@ -118,18 +113,21 @@ public class StemtasticTeleop extends LinearOpMode {
             robot.drive.driveRobotCentricPowers(0,power, 0);
             if (Math.abs(error) <= 20) {
                 drivecompleted = true;
-                error = 0;
-                derivative = 0;
             }
         }
         else if (option == 2) {
             robot.drive.driveRobotCentricPowers(0,0,power);
             if (Math.abs(error) <= 20) {
                 drivecompleted = true;
-                error = 0;
-                derivative = 0;
             }
         }
+        else if (option == 3) {
+            //put arm up macro here
+        }
+        else if (option == 4) {
+            //arm down macro here
+        }
+        lastError = error;
     }
     @Override
     public void runOpMode () throws InterruptedException {
@@ -142,8 +140,6 @@ public class StemtasticTeleop extends LinearOpMode {
         robot.inDep.setRotationPosition(rotationPos);
         waitForStart();
         while (opModeIsActive()) {
-            double time = runtime.time();
-            telemetry.addData("Time: ", time);
             double strafe = -gamepad1.left_stick_x;
             double turn = -gamepad1.right_stick_x;
             double forward = -gamepad1.left_stick_y;
@@ -173,16 +169,17 @@ public class StemtasticTeleop extends LinearOpMode {
             if (elbowp < 0) {
                 elbowpp = elbowp * 0.1;
             }
-            if (gamepad1.circle && !toggleMacroTag) {
+            if (gamepad1.circle) {
                 macroTagRunning = true;
             }
+            if (!gamepad1.circle) {
+                macroTagRunning = false;
+            }
             if (macroTagRunning) {
-                driveToTag(lastDetectedTag);
-                toggleMacroTag = true;
                 if (drivecompleted) {
-                    toggleMacroTag = false;
                     macroTagRunning = false;
                 }
+                driveToTag(lastDetectedTag); //change ts
             }
             encoderposs = robot.inDep.getEncoder(encoderposs);
             robot.inDep.setElbowPosition(elbowpp);
