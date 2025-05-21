@@ -15,9 +15,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 
-//TODO: write arm up and down macros
-//TODO: code possible auto and design coord system
-//TODO: make xinchradius method
+//TODO: code possible auto and design coordinate system
 @TeleOp (name = "StemtasticTeleOp")
 public class StemtasticTeleop extends LinearOpMode {
     public RobotSystem robot;
@@ -28,7 +26,7 @@ public class StemtasticTeleop extends LinearOpMode {
     private boolean clawOpen = true;
     private boolean wasXPressedLastLoop = false;
     private boolean rotdown = true;
-    private boolean wassqpressedlastloop = false;
+    private boolean wasSqpressedlastloop = false;
     public double elbowpp;
     public double lastError = 0;
     public double elbowp;
@@ -189,7 +187,7 @@ public class StemtasticTeleop extends LinearOpMode {
                 }
             }
             boolean ispressed = gamepad1.square;
-            if (ispressed && !wassqpressedlastloop) {
+            if (ispressed && !wasSqpressedlastloop) {
                 rotdown = !rotdown;
                 if (rotdown) {
                     rotationPos = RobotConstants.CLAWROTATIONPIKINGUP;
@@ -233,7 +231,7 @@ public class StemtasticTeleop extends LinearOpMode {
             telemetry.addData("Forward: ", forward);
             telemetry.update();
             wasXPressedLastLoop = isPressed;
-            wassqpressedlastloop = ispressed;
+            wasSqpressedlastloop = ispressed;
         }
     }
 }
