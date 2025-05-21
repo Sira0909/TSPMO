@@ -35,6 +35,9 @@ public class StemtasticTeleop extends LinearOpMode {
     public double lastTime = 0;
     public double speed = 0.4;
     public boolean macroTagRunning = true;
+    public boolean isDownMacroRunning = false;
+    public boolean isUpMacroRunning = false;
+    public boolean isElbowMoveCompleted = false;
     public WebcamName am = hardwareMap.get(WebcamName.class, "Wbam");
 
     public AprilTagDetection lastDetectedTag;
@@ -77,6 +80,11 @@ public class StemtasticTeleop extends LinearOpMode {
         PD(errorY,1);
         PD(erroryaw,2);
     }
+    public void elbowMacros(double setpoint) {
+        isElbowMoveCompleted = false;
+        double errorr = setpoint - encoderposs;
+        PD(errorr, 3);
+    }
     public void PD (double error, double option) {
         double time = runtime.seconds();
         double kP = 0.02;
@@ -103,16 +111,17 @@ public class StemtasticTeleop extends LinearOpMode {
             }
         }
         else if (option == 3) {
-            //put arm up macro here
-        }
-        else if (option == 4) {
-            //arm down macro here
+            elbowp = power;
+            if (Math.abs(error) <= 5) {
+                isElbowMoveCompleted = true;
+            }
         }
         lastError = error;
         lastTime = time;
     }
     //ts method
-    public void xInchRadius() {
+    public void xInchRadius(AprilTagDetection taggg, double radius) {
+        double distance = taggg.ftcPose.range;
 
     }
     @Override
@@ -130,6 +139,37 @@ public class StemtasticTeleop extends LinearOpMode {
             double turn = -gamepad1.right_stick_x;
             double forward = -gamepad1.left_stick_y;
             robot.drive.driveRobotCentricPowers(strafe * speed, forward * speed, turn * speed);
+            encoderposs = robot.inDep.getEncoder(encoderposs);
+            if (gamepad1.dpad_left) {
+                isUpMacroRunning = true;
+            }
+            if (!gamepad1.dpad_left) {
+                isUpMacroRunning = false;
+            }
+            if (gamepad1.dpad_down) {
+                isElbowMoveCompleted = false;
+                isDownMacroRunning = true;
+            }
+            if (!gamepad1.dpad_down) {
+                isElbowMoveCompleted = false;
+                isDownMacroRunning = false;
+            }
+            if (isUpMacroRunning) {
+                if (isElbowMoveCompleted) {
+                    isUpMacroRunning = false;
+                }
+                else {
+                    elbowMacros(70);
+                }
+            }
+            if (isDownMacroRunning) {
+                if (isElbowMoveCompleted) {
+                    isDownMacroRunning = false;
+                }
+                else {
+                    elbowMacros(-600);
+                }
+            }
             boolean isPressed = gamepad1.dpad_right;
             if (isPressed && !wasXPressedLastLoop) {
                 clawOpen = !clawOpen;
@@ -148,7 +188,9 @@ public class StemtasticTeleop extends LinearOpMode {
                     rotationPos = RobotConstants.CLAWROTATIONBACKBOARD;
                 }
             }
-            elbowp = -gamepad1.right_stick_y;
+            if (drivecompleted) {
+                elbowp = -gamepad1.right_stick_y;
+            }
             if (elbowp >= 0) {
                 elbowpp = elbowp * 0.3;
             }
@@ -169,10 +211,10 @@ public class StemtasticTeleop extends LinearOpMode {
                     driveToTag(lastDetectedTag); //change ts
                 }
             }
-            encoderposs = robot.inDep.getEncoder(encoderposs);
             robot.inDep.setElbowPosition(elbowpp);
             robot.inDep.setClawPosition(clawPos);
             robot.inDep.setRotationPosition(rotationPos);
+            detectTags();
             telemetry.addData("Rotation Position: ", rotationPos);
             telemetry.addData("Claw Position: ", clawPos);
             telemetry.addData("Elbow: ", elbowp);
@@ -183,7 +225,6 @@ public class StemtasticTeleop extends LinearOpMode {
             telemetry.update();
             wasXPressedLastLoop = isPressed;
             wassqpressedlastloop = ispressed;
-            detectTags();
         }
     }
 }
