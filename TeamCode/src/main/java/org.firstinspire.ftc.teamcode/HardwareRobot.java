@@ -25,7 +25,7 @@ public class HardwareRobot {
     public final MotorEx elbow;
     public final Servo clawrotation;
 
-    public final WebcamName camera;
+    public WebcamName camera;
 
     public HardwareRobot(HardwareMap hardwareMap) {
 

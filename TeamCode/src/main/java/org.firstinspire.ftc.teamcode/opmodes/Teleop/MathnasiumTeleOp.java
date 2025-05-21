@@ -5,19 +5,19 @@ import android.util.Size;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspire.ftc.teamcode.HardwareRobot;
 import org.firstinspire.ftc.teamcode.RobotSystem;
 import org.firstinspire.ftc.teamcode.RobotConstants;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 
 //TODO: code possible auto and design coordinate system
-@TeleOp (name = "StemtasticTeleOp")
-public class StemtasticTeleop extends LinearOpMode {
+@TeleOp (name = "Mathnasium TeleOp")
+public class MathnasiumTeleOp extends LinearOpMode {
     public RobotSystem robot;
     public ElapsedTime runtime = new ElapsedTime();
     public double rotationPos;
@@ -36,7 +36,6 @@ public class StemtasticTeleop extends LinearOpMode {
     public boolean isDownMacroRunning = false;
     public boolean isUpMacroRunning = false;
     public boolean isElbowMoveCompleted = false;
-    public WebcamName am = hardwareMap.get(WebcamName.class, "Wbam");
 
     public AprilTagDetection lastDetectedTag;
     public boolean drivecompleted = false;
@@ -48,7 +47,7 @@ public class StemtasticTeleop extends LinearOpMode {
             .build();
     VisionPortal visionPortal = new VisionPortal.Builder()
             .addProcessor(tagProcessor)
-            .setCamera(am)
+            .setCamera()
             .setCameraResolution(new Size(400,400)) //obv replace
             .setStreamFormat(VisionPortal.StreamFormat.YUY2)
             .enableLiveView(true)

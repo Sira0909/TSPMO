@@ -11,6 +11,7 @@ public class DriveTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         this.robot = new RobotSystem(hardwareMap, this);
+        waitForStart();
         while (opModeIsActive()) {
             double strafe = gamepad1.left_stick_x;
             double forward = -gamepad1.left_stick_y;
