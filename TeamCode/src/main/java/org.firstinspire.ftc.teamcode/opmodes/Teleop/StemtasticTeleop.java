@@ -119,10 +119,13 @@ public class StemtasticTeleop extends LinearOpMode {
         lastError = error;
         lastTime = time;
     }
-    //ts method
-    public void xInchRadius(AprilTagDetection taggg, double radius) {
-        double distance = taggg.ftcPose.range;
-
+    //when robot is in a radius away from a speific april tage (likly the backboar), for it to half speed
+    public boolean xInchRadius(AprilTagDetection taggg, double radius) {
+        boolean check = false;
+        if (taggg.ftcPose.range <= radius) {
+            check = true;
+        }
+        return check;
     }
     @Override
     public void runOpMode () throws InterruptedException {
@@ -138,6 +141,12 @@ public class StemtasticTeleop extends LinearOpMode {
             double strafe = -gamepad1.left_stick_x;
             double turn = -gamepad1.right_stick_x;
             double forward = -gamepad1.left_stick_y;
+            if (xInchRadius(lastDetectedTag, 4)) {
+                speed = 0.2;
+            }
+            else {
+                speed = 0.4;
+            }
             robot.drive.driveRobotCentricPowers(strafe * speed, forward * speed, turn * speed);
             encoderposs = robot.inDep.getEncoder(encoderposs);
             if (gamepad1.dpad_left) {
