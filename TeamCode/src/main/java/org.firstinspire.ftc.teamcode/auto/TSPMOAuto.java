@@ -1,13 +1,13 @@
 package org.firstinspire.ftc.teamcode.auto;
-
 import com.arcrobotics.ftclib.command.Robot;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspire.ftc.teamcode.HardwareRobot;
 import org.firstinspire.ftc.teamcode.RobotSystem;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-
+@Autonomous (name = "TSPMOAuto")
 public class TSPMOAuto extends LinearOpMode {
     public RobotSystem robot;
     @Override

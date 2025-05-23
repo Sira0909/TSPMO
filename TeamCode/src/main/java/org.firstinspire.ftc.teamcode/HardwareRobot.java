@@ -75,7 +75,7 @@ public class HardwareRobot {
         elbow.setRunMode(Motor.RunMode.RawPower);
         elbow.setInverted(true);
         elbow.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        elbowtwo = new MotorEx(hardwareMap, "Elbow", Motor.GoBILDA.RPM_30);
+        elbowtwo = new MotorEx(hardwareMap, "elbowtwo", Motor.GoBILDA.RPM_30);
         elbowtwo.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elbowtwo.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         elbowtwo.setRunMode(Motor.RunMode.RawPower);
