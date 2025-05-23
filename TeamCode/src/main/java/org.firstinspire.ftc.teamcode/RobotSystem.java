@@ -14,12 +14,13 @@ public class RobotSystem {
     public final LinearOpMode opMode;
     public final DriveSubsystem drive;
     public final indepSubsystem inDep;
+    public final HardwareRobot hardwareRobot;
 
     public HardwareMap hardwareMap;
 
     public RobotSystem(HardwareMap hardwareMap, LinearOpMode opMode) {
         this.opMode = opMode;
-        HardwareRobot hardwareRobot = new HardwareRobot(hardwareMap);
+        this.hardwareRobot = new HardwareRobot(hardwareMap);
         this.drive = new DriveSubsystem(
                 hardwareRobot.leftFront,
                 hardwareRobot.rightFront,

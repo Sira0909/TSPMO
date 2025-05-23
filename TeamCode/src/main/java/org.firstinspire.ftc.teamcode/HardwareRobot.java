@@ -23,6 +23,7 @@ public class HardwareRobot {
 
     public final Servo claw;
     public final MotorEx elbow;
+    public final MotorEx elbowtwo;
     public final Servo clawrotation;
 
     public WebcamName camera;
@@ -68,12 +69,18 @@ public class HardwareRobot {
         rightBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         //check rpm for elbow
-        elbow = new MotorEx(hardwareMap, "Elbow", Motor.GoBILDA.RPM_312);
+        elbow = new MotorEx(hardwareMap, "Elbow", Motor.GoBILDA.RPM_30);
         elbow.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elbow.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         elbow.setRunMode(Motor.RunMode.RawPower);
         elbow.setInverted(true);
         elbow.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        elbowtwo = new MotorEx(hardwareMap, "Elbow", Motor.GoBILDA.RPM_30);
+        elbowtwo.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elbowtwo.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        elbowtwo.setRunMode(Motor.RunMode.RawPower);
+        elbowtwo.setInverted(true);
+        elbowtwo.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         /////////////
         // SERVOS  //
         /////////////

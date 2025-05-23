@@ -3,6 +3,7 @@ package org.firstinspire.ftc.teamcode.auto;
 import com.arcrobotics.ftclib.command.Robot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspire.ftc.teamcode.HardwareRobot;
 import org.firstinspire.ftc.teamcode.RobotSystem;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -12,7 +13,7 @@ public class TSPMOAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         this.robot = new RobotSystem(hardwareMap, this);
-        robot.InitAprilTags();
+        robot.InitAprilTags(robot.hardwareRobot.camera);
         waitForStart();
         while (opModeIsActive()) {
             /// Coordinate System Explanation:

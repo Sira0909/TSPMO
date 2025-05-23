@@ -47,7 +47,7 @@ public class MathnasiumTeleOp extends LinearOpMode {
             .build();
     VisionPortal visionPortal = new VisionPortal.Builder()
             .addProcessor(tagProcessor)
-            .setCamera()
+            .setCamera(robot.hardwareRobot.camera)
             .setCameraResolution(new Size(400,400)) //obv replace
             .setStreamFormat(VisionPortal.StreamFormat.YUY2)
             .enableLiveView(true)
@@ -116,7 +116,6 @@ public class MathnasiumTeleOp extends LinearOpMode {
         lastError = error;
         lastTime = time;
     }
-    //when robot is in a radius away from a speific april tage (likly the backboar), for it to half speed
     public boolean xInchRadius(AprilTagDetection taggg, double radius) {
         boolean check = false;
         if (taggg.ftcPose.range <= radius) {
@@ -126,7 +125,7 @@ public class MathnasiumTeleOp extends LinearOpMode {
     }
     @Override
     public void runOpMode () throws InterruptedException {
-        visionPortal.setActiveCamera(am);
+        visionPortal.setActiveCamera(robot.hardwareRobot.camera);
         visionPortal.setProcessorEnabled(tagProcessor, true);
         this.robot = new RobotSystem(hardwareMap, this);
         clawPos = RobotConstants.CLOSECLAW;

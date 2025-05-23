@@ -24,6 +24,7 @@ public class indepSubsystem extends SubsystemBase {
 
     public void setElbowPosition(double Elbowppos) {
         HARDWAREROBOT.elbow.motor.setPower(Elbowppos);
+        HARDWAREROBOT.elbowtwo.motor.setPower(Elbowppos);
     }
     public void setClawPosition(double clawPos) {
         HARDWAREROBOT.claw.setPosition(clawPos);
