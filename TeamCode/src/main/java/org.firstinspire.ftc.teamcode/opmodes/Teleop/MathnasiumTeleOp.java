@@ -47,7 +47,7 @@ public class MathnasiumTeleOp extends LinearOpMode {
             .build();
     VisionPortal visionPortal = new VisionPortal.Builder()
             .addProcessor(tagProcessor)
-            .setCamera(robot.hardwareRobot.camera)
+            .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
             .setCameraResolution(new Size(400,400)) //obv replace
             .setStreamFormat(VisionPortal.StreamFormat.YUY2)
             .enableLiveView(true)
@@ -125,7 +125,7 @@ public class MathnasiumTeleOp extends LinearOpMode {
     }
     @Override
     public void runOpMode () throws InterruptedException {
-        visionPortal.setActiveCamera(robot.hardwareRobot.camera);
+        visionPortal.setActiveCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
         visionPortal.setProcessorEnabled(tagProcessor, true);
         this.robot = new RobotSystem(hardwareMap, this);
         clawPos = RobotConstants.CLOSECLAW;
@@ -193,14 +193,8 @@ public class MathnasiumTeleOp extends LinearOpMode {
                     rotationPos = RobotConstants.CLAWROTATIONBACKBOARD;
                 }
             }
-            if (drivecompleted) {
+            if (isElbowMoveCompleted) {
                 elbowp = -gamepad1.right_stick_y;
-            }
-            if (elbowp >= 0) {
-                elbowpp = elbowp * 0.3;
-            }
-            if (elbowp < 0) {
-                elbowpp = elbowp * 0.1;
             }
             if (gamepad1.circle) {
                 macroTagRunning = true;
@@ -216,7 +210,7 @@ public class MathnasiumTeleOp extends LinearOpMode {
                     driveToTag(lastDetectedTag); //change ts
                 }
             }
-            robot.inDep.setElbowPosition(elbowpp);
+            robot.inDep.setElbowPosition(elbowp);
             robot.inDep.setClawPosition(clawPos);
             robot.inDep.setRotationPosition(rotationPos);
             detectTags();

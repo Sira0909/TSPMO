@@ -13,7 +13,6 @@ public class TSPMOAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         this.robot = new RobotSystem(hardwareMap, this);
-        robot.InitAprilTags(robot.hardwareRobot.camera);
         waitForStart();
         while (opModeIsActive()) {
             /// Coordinate System Explanation:

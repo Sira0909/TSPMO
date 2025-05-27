@@ -16,8 +16,6 @@ public class RobotSystem {
     public final indepSubsystem inDep;
     public final HardwareRobot hardwareRobot;
 
-    public HardwareMap hardwareMap;
-
     public RobotSystem(HardwareMap hardwareMap, LinearOpMode opMode) {
         this.opMode = opMode;
         this.hardwareRobot = new HardwareRobot(hardwareMap);
@@ -32,21 +30,5 @@ public class RobotSystem {
                 drive,
                 hardwareRobot
         );
-    }
-    public void InitAprilTags(WebcamName am) {
-        AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder()
-                .setDrawAxes(true)
-                .setDrawTagID(true)
-                .setDrawTagOutline(true)
-                .setDrawCubeProjection(true)
-                .build();
-        VisionPortal visionPortal = new VisionPortal.Builder()
-                .addProcessor(tagProcessor)
-                .setCamera(am)
-                .setCameraResolution(new Size(400,400)) //obv replace
-                .setStreamFormat(VisionPortal.StreamFormat.YUY2)
-                .enableLiveView(true)
-                .setAutoStopLiveView(true)
-                .build();
     }
 }

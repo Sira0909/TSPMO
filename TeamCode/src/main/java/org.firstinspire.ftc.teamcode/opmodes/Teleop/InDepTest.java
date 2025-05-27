@@ -1,30 +1,91 @@
 package org.firstinspire.ftc.teamcode.opmodes.Teleop;
 
+import android.util.Size;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspire.ftc.teamcode.RobotConstants;
 import org.firstinspire.ftc.teamcode.RobotSystem;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import java.util.ArrayList;
+//TODO: add elbow macros w separate controller, add xinchradius
+//TODO: how tf do i add a one time reset of lastTime and lastErrors when a new controller starts bro
 @TeleOp (name = "InDep Test")
 public class InDepTest extends LinearOpMode {
     public RobotSystem robot;
     public double rotationPos;
     public double clawPos;
     public int encoderposs;
+    public ElapsedTime runtime = new ElapsedTime();
+    public double lastError = 0;
+    public double lastError1 = 0;
+    public double lastError2 = 0;
+    public double lastTime = 0;
+    public boolean macroTagRunning = false;
+    public boolean macroJustStarted = false;
+    public boolean drivecompleted = false;
+    public double elbowp;
     private boolean clawOpen = true;
     private boolean wasXPressedLastLoop = false;
     private boolean rotdown = true;
     private boolean wasSqpressedlastloop = false;
+    public double speed = 0.45;
+    public AprilTagDetection lastTagDetected;
+    public AprilTagProcessor tagProcessor;
+    public VisionPortal visionPortal;
+    public double clamp(double value, double maxMagnitude) {
+        return Math.copySign(Math.min(Math.abs(value), maxMagnitude), value);
+    }
+    public void reset() {
+        lastError = 0;
+        lastError1 = 0;
+        lastError2 = 0;
+        lastTime = 0;
+    }
     @Override
     public void runOpMode() throws InterruptedException {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         this.robot = new RobotSystem(hardwareMap, this);
         clawPos = RobotConstants.CLOSECLAW;
         robot.inDep.setClawPosition(clawPos);
         rotationPos = RobotConstants.CLAWROTATIONBACKBOARD;
         robot.inDep.setRotationPosition(rotationPos);
+        this.tagProcessor = new AprilTagProcessor.Builder()
+                .setDrawAxes(true)
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                .setDrawCubeProjection(true)
+                .build();
+        this.visionPortal = new VisionPortal.Builder()
+                .addProcessor(tagProcessor)
+                .setCamera(robot.hardwareRobot.webcamName)
+                .setAutoStopLiveView(false)
+                .enableLiveView(true)
+                .setAutoStartStreamOnBuild(true)
+                .setLiveViewContainerId(cameraMonitorViewId)
+                .setStreamFormat(VisionPortal.StreamFormat.YUY2)
+                .build();
+        visionPortal.setProcessorEnabled(tagProcessor, true);
         waitForStart();
         while (opModeIsActive()) {
+            encoderposs = robot.inDep.getEncoder(encoderposs);
+            elbowp = gamepad1.right_stick_y * 0.5;
+            double strafe = -gamepad1.left_stick_y;
+            double forward = -gamepad1.left_stick_x;
+            double turn = gamepad1.right_stick_x;
+            if (Math.abs(turn) > 0) {
+                robot.hardwareRobot.changeInversions();
+            }
+            if (!macroTagRunning) {
+                robot.drive.driveRobotCentricPowers(strafe * speed, forward * speed, turn * speed);
+            }
             boolean isPressed = gamepad1.dpad_right;
             if (isPressed && !wasXPressedLastLoop) {
                 clawOpen = !clawOpen;
@@ -34,6 +95,7 @@ public class InDepTest extends LinearOpMode {
                     clawPos = RobotConstants.CLOSECLAW;
                 }
             }
+            detectTags();
             boolean ispressed = gamepad1.square;
             if (ispressed && !wasSqpressedlastloop) {
                 rotdown = !rotdown;
@@ -43,10 +105,94 @@ public class InDepTest extends LinearOpMode {
                     rotationPos = RobotConstants.CLAWROTATIONBACKBOARD;
                 }
             }
+            //update this
+            if (gamepad1.circle) {
+                if (!drivecompleted) {
+                    macroTagRunning = true;
+                }
+            }
+            if (macroTagRunning) {
+                driveToTag(lastTagDetected); //change ts
+                if (drivecompleted) {
+                    drivecompleted = false;
+                    macroTagRunning = false;
+                }
+            }
             robot.inDep.setClawPosition(clawPos);
             robot.inDep.setRotationPosition(rotationPos);
+            robot.inDep.setElbowPosition(elbowp);
+            telemetry.addData("Strafe: ", strafe);
+            telemetry.addData("Turn: ", turn);
+            telemetry.addData("Forward: ", forward);
+            telemetry.addData("Rotation Position: ", rotationPos);
+            telemetry.addData("Claw Position: ", clawPos);
+            telemetry.addData("Encoder Position: ", encoderposs);
+            telemetry.update();
             wasXPressedLastLoop = isPressed;
             wasSqpressedlastloop = ispressed;
         }
+    }
+    public void detectTags() {
+        ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
+        if(detections != null && !detections.isEmpty()) {
+            for(AprilTagDetection tag : detections) {
+                telemetry.addLine("AprilTag Detected.");
+                telemetry.addData("ID", tag.id);
+                telemetry.addData("X (Sideways offset)", tag.ftcPose.x);
+                telemetry.addData("Y (Forward/Back Offset)", tag.ftcPose.y);
+                telemetry.addData("Z", tag.ftcPose.z);
+                telemetry.addData("Bearing", tag.ftcPose.bearing);
+                telemetry.addData("Yaw", tag.ftcPose.yaw);
+                lastTagDetected = tag;
+                break;
+            }
+        } else {
+            lastTagDetected = null; // clear old tag when none detected
+        }
+    }
+    public void driveToTag(AprilTagDetection tagg) {
+        if (tagg == null) {
+            return;
+        }
+        double errorX =  tagg.ftcPose.x;
+        double errorY =  tagg.ftcPose.y;
+        double erroryaw = tagg.ftcPose.yaw;
+        PD(errorX, errorY, erroryaw);
+    }
+    //inital deltatime is supposed to be zero
+    //also initial error diff is supposed to be zero
+    public void PD(double errorX, double errorY, double errorYaw) {
+        double time = runtime.seconds();
+        double deltaTime = time - lastTime;
+
+        double kP = 0.015;
+        double kD = 0.002;
+
+        double derivativeX = (errorX - lastError) / deltaTime;
+        double derivativeY = (errorY - lastError1) / deltaTime;
+        double derivativeYaw = (errorYaw - lastError2) / deltaTime;
+        //this condition resolves both of the cases above
+        if (deltaTime == time) {
+            derivativeX = 0;
+            derivativeY = 0;
+            derivativeYaw = 0;
+        }
+        double powerX = kP * errorX + kD * derivativeX;
+        double powerY = kP * errorY + kD * derivativeY;
+        double powerYaw = kP * errorYaw + kD * derivativeYaw;
+
+        //possibly clamp because drive only takes -1 to 1?
+
+        //        powerX = clamp(powerX, 0.4);
+          //      powerY = clamp(powerY, 0.4);
+            //    powerYaw = clamp(powerYaw, 0.4);
+        robot.drive.driveRobotCentricPowers(powerX, powerY, powerYaw);
+        if (Math.abs(errorY) <= 30 && Math.abs(errorX) <= 10 && Math.abs(errorYaw) <= 0.4) {
+            drivecompleted = true;
+        }
+        lastError = errorX;
+        lastError1 = errorY;
+        lastError2 = errorYaw;
+        lastTime = time;
     }
 }

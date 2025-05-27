@@ -25,8 +25,7 @@ public class HardwareRobot {
     public final MotorEx elbow;
     public final MotorEx elbowtwo;
     public final Servo clawrotation;
-
-    public WebcamName camera;
+    public final WebcamName webcamName;
 
     public HardwareRobot(HardwareMap hardwareMap) {
 
@@ -54,8 +53,8 @@ public class HardwareRobot {
         rightBack.setRunMode(Motor.RunMode.RawPower);
 
         leftFront.setInverted(false);
-        rightFront.setInverted(true);
-        leftBack.setInverted(false);
+        rightFront.setInverted(false);
+        leftBack.setInverted(true);
         rightBack.setInverted(false);
 
         leftFront.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -86,7 +85,10 @@ public class HardwareRobot {
         /////////////
         claw = hardwareMap.get(ServoImplEx.class, "Claw");
         clawrotation = hardwareMap.get(ServoImplEx.class, "Rotation");
-
-        camera = hardwareMap.get(WebcamName.class, "Webcam 1");
+        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+    }
+    public void changeInversions() {
+        leftFront.setInverted(true);
+        rightBack.setInverted(true);
     }
 }
