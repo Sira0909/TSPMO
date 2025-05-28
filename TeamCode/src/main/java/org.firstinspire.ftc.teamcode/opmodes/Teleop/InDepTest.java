@@ -39,6 +39,7 @@ public class InDepTest extends LinearOpMode {
     public AprilTagDetection lastTagDetected;
     public AprilTagProcessor tagProcessor;
     public VisionPortal visionPortal;
+    public boolean wascirclprssdlastloop = false;
     public double clamp(double value, double maxMagnitude) {
         return Math.copySign(Math.min(Math.abs(value), maxMagnitude), value);
     }
@@ -75,6 +76,7 @@ public class InDepTest extends LinearOpMode {
         visionPortal.setProcessorEnabled(tagProcessor, true);
         waitForStart();
         while (opModeIsActive()) {
+            boolean circlePressd = gamepad1.circle;
             encoderposs = robot.inDep.getEncoder(encoderposs);
             elbowp = gamepad1.right_stick_y * 0.5;
             double strafe = -gamepad1.left_stick_y;
@@ -106,7 +108,10 @@ public class InDepTest extends LinearOpMode {
                 }
             }
             //update this
-            if (gamepad1.circle) {
+            if (circlePressd && !wascirclprssdlastloop) {
+                reset();
+            }
+            if (circlePressd) {
                 if (!drivecompleted) {
                     macroTagRunning = true;
                 }
@@ -130,6 +135,7 @@ public class InDepTest extends LinearOpMode {
             telemetry.update();
             wasXPressedLastLoop = isPressed;
             wasSqpressedlastloop = ispressed;
+            wascirclprssdlastloop = circlePressd;
         }
     }
     public void detectTags() {
@@ -162,6 +168,7 @@ public class InDepTest extends LinearOpMode {
     //inital deltatime is supposed to be zero
     //also initial error diff is supposed to be zero
     public void PD(double errorX, double errorY, double errorYaw) {
+
         double time = runtime.seconds();
         double deltaTime = time - lastTime;
 
@@ -172,7 +179,7 @@ public class InDepTest extends LinearOpMode {
         double derivativeY = (errorY - lastError1) / deltaTime;
         double derivativeYaw = (errorYaw - lastError2) / deltaTime;
         //this condition resolves both of the cases above
-        if (deltaTime == time) {
+        if (lastTime == 0) {
             derivativeX = 0;
             derivativeY = 0;
             derivativeYaw = 0;
@@ -183,11 +190,11 @@ public class InDepTest extends LinearOpMode {
 
         //possibly clamp because drive only takes -1 to 1?
 
-        //        powerX = clamp(powerX, 0.4);
-          //      powerY = clamp(powerY, 0.4);
-            //    powerYaw = clamp(powerYaw, 0.4);
+        powerX = clamp(powerX, 1);
+        powerY = clamp(powerY, 1);
+        powerYaw = clamp(powerYaw, 1);
         robot.drive.driveRobotCentricPowers(powerX, powerY, powerYaw);
-        if (Math.abs(errorY) <= 30 && Math.abs(errorX) <= 10 && Math.abs(errorYaw) <= 0.4) {
+        if (Math.abs(errorY) <= 25 && Math.abs(errorX) <= 2 && Math.abs(errorYaw) <= 0.4) {
             drivecompleted = true;
         }
         lastError = errorX;
