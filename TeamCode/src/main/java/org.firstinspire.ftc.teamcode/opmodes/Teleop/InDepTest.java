@@ -39,7 +39,7 @@ public class InDepTest extends LinearOpMode {
     public AprilTagDetection lastTagDetected;
     public AprilTagProcessor tagProcessor;
     public VisionPortal visionPortal;
-    public boolean wascirclprssdlastloop = false;
+    public boolean wascircelpressedlastloop = false;
     public double clamp(double value, double maxMagnitude) {
         return Math.copySign(Math.min(Math.abs(value), maxMagnitude), value);
     }
@@ -108,7 +108,7 @@ public class InDepTest extends LinearOpMode {
                 }
             }
             //update this
-            if (circlePressd && !wascirclprssdlastloop) {
+            if (circlePressd && !wascircelpressedlastloop) {
                 reset();
             }
             if (circlePressd) {
@@ -135,7 +135,7 @@ public class InDepTest extends LinearOpMode {
             telemetry.update();
             wasXPressedLastLoop = isPressed;
             wasSqpressedlastloop = ispressed;
-            wascirclprssdlastloop = circlePressd;
+            wascircelpressedlastloop = circlePressd;
         }
     }
     public void detectTags() {
@@ -168,13 +168,14 @@ public class InDepTest extends LinearOpMode {
     //inital deltatime is supposed to be zero
     //also initial error diff is supposed to be zero
     public void PD(double errorX, double errorY, double errorYaw) {
-
         double time = runtime.seconds();
         double deltaTime = time - lastTime;
 
         double kP = 0.015;
         double kD = 0.002;
-
+        if (deltaTime == 0) {
+            deltaTime = 0.00001;
+        }
         double derivativeX = (errorX - lastError) / deltaTime;
         double derivativeY = (errorY - lastError1) / deltaTime;
         double derivativeYaw = (errorYaw - lastError2) / deltaTime;
@@ -188,11 +189,6 @@ public class InDepTest extends LinearOpMode {
         double powerY = kP * errorY + kD * derivativeY;
         double powerYaw = kP * errorYaw + kD * derivativeYaw;
 
-        //possibly clamp because drive only takes -1 to 1?
-
-        powerX = clamp(powerX, 1);
-        powerY = clamp(powerY, 1);
-        powerYaw = clamp(powerYaw, 1);
         robot.drive.driveRobotCentricPowers(powerX, powerY, powerYaw);
         if (Math.abs(errorY) <= 25 && Math.abs(errorX) <= 2 && Math.abs(errorYaw) <= 0.4) {
             drivecompleted = true;
