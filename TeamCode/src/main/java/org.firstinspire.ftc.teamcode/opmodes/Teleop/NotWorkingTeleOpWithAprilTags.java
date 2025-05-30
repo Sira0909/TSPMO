@@ -1,23 +1,19 @@
 package org.firstinspire.ftc.teamcode.opmodes.Teleop;
 
-import android.util.Size;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspire.ftc.teamcode.RobotConstants;
 import org.firstinspire.ftc.teamcode.RobotSystem;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.ArrayList;
-//TODO: add elbow macros w separate controller, add xinchradius
-//TODO: how tf do i add a one time reset of lastTime and lastErrors when a new controller starts bro
-@TeleOp (name = "InDep Test")
-public class InDepTest extends LinearOpMode {
+//TODO: add elbow macros w separate controller
+@TeleOp (name = "RealTeleOp")
+public class NotWorkingTeleOpWithAprilTags extends LinearOpMode {
     public RobotSystem robot;
     public double rotationPos;
     public double clawPos;
@@ -28,7 +24,6 @@ public class InDepTest extends LinearOpMode {
     public double lastError2 = 0;
     public double lastTime = 0;
     public boolean macroTagRunning = false;
-    public boolean macroJustStarted = false;
     public boolean drivecompleted = false;
     public double elbowp;
     private boolean clawOpen = true;
@@ -132,6 +127,9 @@ public class InDepTest extends LinearOpMode {
             telemetry.addData("Rotation Position: ", rotationPos);
             telemetry.addData("Claw Position: ", clawPos);
             telemetry.addData("Encoder Position: ", encoderposs);
+            if (lastTagDetected != null) {
+                telemetry.addData("Proximity to closest tag: (5 inches) ", xInchRadius(lastTagDetected, 5));
+            }
             telemetry.update();
             wasXPressedLastLoop = isPressed;
             wasSqpressedlastloop = ispressed;
@@ -168,6 +166,7 @@ public class InDepTest extends LinearOpMode {
     //inital deltatime is supposed to be zero
     //also initial error diff is supposed to be zero
     public void PD(double errorX, double errorY, double errorYaw) {
+        telemetry.addLine("PD in effect");
         double time = runtime.seconds();
         double deltaTime = time - lastTime;
 
@@ -197,5 +196,12 @@ public class InDepTest extends LinearOpMode {
         lastError1 = errorY;
         lastError2 = errorYaw;
         lastTime = time;
+    }
+    public boolean xInchRadius(AprilTagDetection taggg, double radius) {
+        boolean check = false;
+        if (taggg.ftcPose.range <= radius) {
+            check = true;
+        }
+        return check;
     }
 }
