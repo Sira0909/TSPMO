@@ -119,10 +119,6 @@ public class MathnasiumTeleOp extends LinearOpMode {
         }
     }
     public boolean xInchRadius(AprilTagDetection taggg, double radius) {
-        boolean check = false;
-        if (taggg.ftcPose.range <= radius) {
-            check = true;
-        }
-        return check;
+        return radius <= taggg.ftcPose.range;
     }
 }
