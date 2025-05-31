@@ -11,12 +11,20 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.ArrayList;
-@TeleOp (name = "RealTeleOp")
+//TODO: add elbow macros w separate controller
+@TeleOp (name = "RealTeleOooop")
 public class MathnasiumTeleOp extends LinearOpMode {
     public RobotSystem robot;
     public double rotationPos;
     public double clawPos;
     public int encoderposs;
+    public ElapsedTime runtime = new ElapsedTime();
+    public double lastError = 0;
+    public double lastError1 = 0;
+    public double lastError2 = 0;
+    public double lastTime = 0;
+    public boolean macroTagRunning = false;
+    public boolean drivecompleted = false;
     public double elbowp;
     private boolean clawOpen = true;
     private boolean wasXPressedLastLoop = false;
@@ -26,6 +34,16 @@ public class MathnasiumTeleOp extends LinearOpMode {
     public AprilTagDetection lastTagDetected;
     public AprilTagProcessor tagProcessor;
     public VisionPortal visionPortal;
+    public boolean wascircelpressedlastloop = false;
+    public double clamp(double value, double maxMagnitude) {
+        return Math.copySign(Math.min(Math.abs(value), maxMagnitude), value);
+    }
+    public void reset() {
+        lastError = 0;
+        lastError1 = 0;
+        lastError2 = 0;
+        lastTime = 0;
+    }
     @Override
     public void runOpMode() throws InterruptedException {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
@@ -53,6 +71,7 @@ public class MathnasiumTeleOp extends LinearOpMode {
         visionPortal.setProcessorEnabled(tagProcessor, true);
         waitForStart();
         while (opModeIsActive()) {
+            boolean circlePressd = gamepad1.circle;
             encoderposs = robot.inDep.getEncoder(encoderposs);
             elbowp = gamepad1.right_stick_y * 0.5;
             double strafe = -gamepad1.left_stick_y;
@@ -61,9 +80,9 @@ public class MathnasiumTeleOp extends LinearOpMode {
             if (Math.abs(turn) > 0) {
                 robot.hardwareRobot.changeInversions();
             }
-
-            robot.drive.driveRobotCentricPowers(strafe * speed, forward * speed, turn * speed);
-
+            if (!macroTagRunning) {
+                robot.drive.driveRobotCentricPowers(strafe * speed, forward * speed, turn * speed);
+            }
             boolean isPressed = gamepad1.dpad_right;
             if (isPressed && !wasXPressedLastLoop) {
                 clawOpen = !clawOpen;
@@ -83,6 +102,22 @@ public class MathnasiumTeleOp extends LinearOpMode {
                     rotationPos = RobotConstants.CLAWROTATIONBACKBOARD;
                 }
             }
+            //update this
+            if (circlePressd && !wascircelpressedlastloop) {
+                reset();
+            }
+            if (circlePressd) {
+                if (!drivecompleted) {
+                    macroTagRunning = true;
+                }
+            }
+            if (macroTagRunning) {
+                driveToTag(lastTagDetected); //change ts
+                if (drivecompleted) {
+                    drivecompleted = false;
+                    macroTagRunning = false;
+                }
+            }
             robot.inDep.setClawPosition(clawPos);
             robot.inDep.setRotationPosition(rotationPos);
             robot.inDep.setElbowPosition(elbowp);
@@ -93,11 +128,15 @@ public class MathnasiumTeleOp extends LinearOpMode {
             telemetry.addData("Claw Position: ", clawPos);
             telemetry.addData("Encoder Position: ", encoderposs);
             if (lastTagDetected != null) {
-                telemetry.addData("Proximity to closest tag: (5 inches) ", xInchRadius(lastTagDetected, 5));
+                telemetry.addData("Proximity to closest tag:", xInchRadius(lastTagDetected, 20));
             }
+            telemetry.addData("Time:", runtime.time());
+            telemetry.addData("MacroTagRunning:", macroTagRunning);
+            telemetry.addData("Drive completed:", drivecompleted);
             telemetry.update();
             wasXPressedLastLoop = isPressed;
             wasSqpressedlastloop = ispressed;
+            wascircelpressedlastloop = circlePressd;
         }
     }
     public void detectTags() {
@@ -111,6 +150,7 @@ public class MathnasiumTeleOp extends LinearOpMode {
                 telemetry.addData("Z", tag.ftcPose.z);
                 telemetry.addData("Bearing", tag.ftcPose.bearing);
                 telemetry.addData("Yaw", tag.ftcPose.yaw);
+                telemetry.addData("Range: ", tag.ftcPose.range);
                 lastTagDetected = tag;
                 break;
             }
@@ -118,7 +158,62 @@ public class MathnasiumTeleOp extends LinearOpMode {
             lastTagDetected = null; // clear old tag when none detected
         }
     }
+    public void driveToTag(AprilTagDetection tagg) {
+        if (tagg == null) {
+            return;
+        }
+        telemetry.addData("Driving to tag of ID: ", tagg.id);
+        double errorX =  tagg.ftcPose.x;
+        double errorY =  tagg.ftcPose.y;
+        double erroryaw = tagg.ftcPose.yaw;
+        PD(errorX, errorY, erroryaw);
+    }
+    //inital deltatime is supposed to be zero
+    //also initial error diff is supposed to be zero
+    public void PD(double errorX, double errorY, double errorYaw) {
+        telemetry.addLine("PD in effect");
+        double time = runtime.seconds();
+        double deltaTime = time - lastTime;
+
+        double kP = 0.03;
+        double kD = 0.005;
+        if (deltaTime == 0) {
+            deltaTime = 0.00001;
+        }
+        double derivativeX = (errorX - lastError) / deltaTime;
+        double derivativeY = (errorY - lastError1) / deltaTime;
+        double derivativeYaw = (errorYaw - lastError2) / deltaTime;
+        //this condition resolves both of the cases above
+        if (lastTime == 0) {
+            derivativeX = 0;
+            derivativeY = 0;
+            derivativeYaw = 0;
+        }
+        double powerX = kP * errorX + kD * derivativeX;
+        double powerY = kP * errorY + kD * derivativeY;
+        double powerYaw = kP * errorYaw + kD * derivativeYaw;
+        if (powerX > 0.5) {
+            powerX = 0.5;
+        }
+        else if (powerY > 0.5) {
+            powerY = 0.5;
+        }
+        else if (powerYaw > 0.5) {
+            powerYaw = 0.5;
+        }
+        robot.drive.driveRobotCentricPowers(powerX, powerY, powerYaw);
+        if (Math.abs(errorY) <= 18 && Math.abs(errorX) <= 0.1 && Math.abs(errorYaw) <= 0.4) {
+            drivecompleted = true;
+        }
+        telemetry.addData("Error X:", errorX);
+        telemetry.addData("Error Y: ", errorY);
+        telemetry.addData("Error Yaw: ", errorYaw);
+        lastError = errorX;
+        lastError1 = errorY;
+        lastError2 = errorYaw;
+        lastTime = time;
+    }
     public boolean xInchRadius(AprilTagDetection taggg, double radius) {
-        return radius <= taggg.ftcPose.range;
+        return taggg.ftcPose.range <= radius;
     }
 }
