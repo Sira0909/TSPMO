@@ -12,7 +12,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.ArrayList;
 //TODO: add elbow macros w separate controller
-@TeleOp (name = "RealTeleOooop")
+@TeleOp (name = "IHateAprilTags")
 public class MathnasiumTeleOp extends LinearOpMode {
     public RobotSystem robot;
     public double rotationPos;
@@ -81,6 +81,10 @@ public class MathnasiumTeleOp extends LinearOpMode {
                 robot.hardwareRobot.changeInversions();
             }
             if (!macroTagRunning) {
+                boolean proximity = xInchRadius(lastTagDetected, 20);
+                if (proximity) {
+                    speed += -0.15;
+                }
                 robot.drive.driveRobotCentricPowers(strafe * speed, forward * speed, turn * speed);
             }
             boolean isPressed = gamepad1.dpad_right;
@@ -214,6 +218,11 @@ public class MathnasiumTeleOp extends LinearOpMode {
         lastTime = time;
     }
     public boolean xInchRadius(AprilTagDetection taggg, double radius) {
-        return taggg.ftcPose.range <= radius;
+        if (lastTagDetected == null) {
+            return false;
+        }
+        else {
+            return taggg.ftcPose.range <= radius;
+        }
     }
 }
