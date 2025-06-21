@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspire.ftc.teamcode.RobotConstants;
 import org.firstinspire.ftc.teamcode.RobotSystem;
 
-
-
+/// Square: rotation, dpad left: claw, right x: turn, right y: elbow, left x: strafe, left y: forward.
+/// If you want to test out apriltag stuff, see other file but note that the drivetotag method is broken. all other detecton and xinchradius work.
 @TeleOp (name = "Cindy's mom: use this.")
 public class TeleOpNoAprilTags extends LinearOpMode {
     public RobotSystem robot;
