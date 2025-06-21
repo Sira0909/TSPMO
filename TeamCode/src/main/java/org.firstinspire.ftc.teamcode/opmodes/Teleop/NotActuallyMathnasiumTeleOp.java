@@ -14,7 +14,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 
-//TODO: code possible auto and design coordinate system
+//TODO: code possible auto and design coordinate system, also add elbow macros.
 @TeleOp (name = "Mathnasium TeleOp")
 public class NotActuallyMathnasiumTeleOp extends LinearOpMode {
     public RobotSystem robot;

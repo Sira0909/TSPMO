@@ -11,7 +11,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.ArrayList;
-//TODO: add elbow macros w separate controller
+//TODO: add elbow macros w separate controller and design auto
 @TeleOp (name = "IHateAprilTags")
 public class MathnasiumTeleOp extends LinearOpMode {
     public RobotSystem robot;
