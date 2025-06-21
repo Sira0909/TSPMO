@@ -1,3 +1,13 @@
+/*
+
+Note: This code uses more Fundamental FTClib. In our latest codebases,
+we adopted Syncropather for macros and a slightly
+different organization style. We will reach out to explain
+this new system in the coming weeks, as we want to share it
+with our team's newer members, as well.
+
+ */
+
 package org.firstinspire.ftc.teamcode.CindysMomUseThis;
 //Import statements.
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode; //Allows us to create main opmode loop
@@ -63,7 +73,7 @@ public class TeleOpWithAprilTags extends LinearOpMode {
             encoderPos = robot.inDep.getEncoder(encoderPos);
             //Has to be reduced - will break elbow if at full power.
             elbowPower = gamepad1.right_stick_y * 0.5;
-            //Issues with the led me to invert some of the joysticks.
+            //Issues with the drive led me to invert some of the joysticks - you may need to tweak some of these
             double strafe = -gamepad1.left_stick_y;
             double forward = -gamepad1.left_stick_x;
             double turn = gamepad1.right_stick_x;
@@ -149,12 +159,12 @@ public class TeleOpWithAprilTags extends LinearOpMode {
             lastTagDetected = null; // clear old tag when none detected
         }
     }
-    public boolean xInchRadius(AprilTagDetection taggg, double radius) {
+    public boolean xInchRadius(AprilTagDetection targetTag, double radius) {
         if (lastTagDetected == null) {
             return false;
         }
         else {
-            return taggg.ftcPose.range <= radius;
+            return targetTag.ftcPose.range <= radius;
         }
     }
 }
