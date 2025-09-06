@@ -2,26 +2,24 @@ package org.firstinspire.ftc.teamcode.cv;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.Size;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
     public class piplin extends OpenCvPipeline {
-        Mat resizedToWidthHeight = new Mat();
-        Mat resizedWithMultiplier = new Mat();
         Mat mask = new Mat();
         Mat ret = new Mat();
+        Scalar red = new Scalar(255, 0, 0);
         @Override
         public Mat processFrame(Mat img) {
-            int width = 100;
-            int height = 100;
-            Imgproc.resize(img, resizedToWidthHeight, new Size(width, height));
-            double xMult = 2;
-            double yMult = 0.5;
-            Imgproc.resize(img, resizedWithMultiplier, new Size(0,0), xMult, yMult);
-            Imgproc.cvtColor(img, img, Imgproc.COLOR_RGB2GRAY);
-            Imgproc.threshold(img, mask, 200, 255, Imgproc.THRESH_BINARY);
+            Rect r = new Rect(150, 500, 100,100);
+            Rect rr = new Rect(500, 500, 100, 100);
+            Rect rrr = new Rect(750, 500, 100, 100);
             Core.bitwise_and(img, mask, ret);
-            return ret;
+            Imgproc.rectangle(img, r, red);
+            Imgproc.rectangle(img, rr, red);
+            Imgproc.rectangle(img, rrr, red);
+            return img;
         }
     }
