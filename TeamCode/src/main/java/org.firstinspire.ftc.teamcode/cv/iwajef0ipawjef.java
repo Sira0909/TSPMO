@@ -1,6 +1,7 @@
 package org.firstinspire.ftc.teamcode.cv;
 
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
@@ -13,15 +14,19 @@ import org.openftc.easyopencv.OpenCvPipeline;
         @Override
         public Mat processFrame(Mat img) {
             int width = img.cols();
-            int length = img.rows();
-            Rect r = new Rect(150, 500, 100,100);
-            Rect rr = new Rect(500, 500, 100, 100);
-            Rect rrr = new Rect(750, 500, 100, 100);
-            Imgproc.rectangle(img, r, red);
-            Imgproc.rectangle(img, rr, red);
-            Imgproc.rectangle(img, rrr, red);
-            System.out.println(width);
-            System.out.println(length);
+            int height = img.rows();
+
+            // Draw the size as text in the top-left corner
+            Imgproc.putText(
+                    img,
+                    "Size: " + width + " x " + height,
+                    new Point(10, 30),
+                    Imgproc.FONT_HERSHEY_SIMPLEX,
+                    1.0,                 // font scale
+                    new Scalar(0, 0, 255), // color (BGR)
+                    2                    // thickness
+            );
+
             return img;
         }
     }
